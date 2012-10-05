@@ -19,7 +19,7 @@ require "bundler/setup"
 require "minitest/autorun"
 require "em/minitest/spec"
 require "eventmachine"
-require "dolt/view"
+require "libdolt/view"
 require "tiltout"
 
 Bundler.require(:default, :test)

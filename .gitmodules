@@ -1,3 +1,0 @@
-[submodule "vendor/ui"]
-	path = vendor/ui
-	url = git://gitorious.org/gitorious/ui3.git

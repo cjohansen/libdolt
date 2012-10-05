@@ -67,28 +67,4 @@ describe Dolt::View::Markup do
       assert_equal 2, html.scan(/common-lisp/).length
     end
   end
-
-  describe "#highlight_code_blocks" do
-    include StubHighlighter
-
-    it "does not touch non-markdown files" do
-      content = "```cl\n(yup)\n```"
-      assert_equal content, highlight_code_blocks("file.rst", content)
-    end
-
-    it "highlights one-line code block" do
-      content = "```cl\n(yup)\n```"
-      assert_match "##[cl](yup)##", highlight_code_blocks("file.md", content)
-    end
-
-    it "highlights multi-line code block" do
-      content = "```cl\n(yup)\n(yessir-p t)\n```"
-      assert_match "##[cl](yup)\n(yessir-p t)##", highlight_code_blocks("file.md", content)
-    end
-
-    it "preserves code block white-space" do
-      content = "```cl\n(yup\n  (yessir-p t))\n```"
-      assert_match "##[cl](yup\n  (yessir-p t))##", highlight_code_blocks("file.md", content)
-    end
-  end
 end

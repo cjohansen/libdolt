@@ -21,3 +21,9 @@ require "libdolt/version"
 require "libdolt/disk_repo_resolver"
 require "libdolt/repo_actions"
 require "libdolt/view"
+
+module Dolt
+  def self.template_dir
+    File.join(File.dirname(__FILE__), "..", "views")
+  end
+end

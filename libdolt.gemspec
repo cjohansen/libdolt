@@ -14,11 +14,10 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "libdolt"
 
   s.add_dependency "eventmachine", "~>1.0"
-  s.add_dependency "pygments.rb", "~>0.2"
   s.add_dependency "em_pessimistic", "~>0.1"
   s.add_dependency "em_rugged", "~> 0.1.2"
   s.add_dependency "tzinfo", "~> 0.3"
-  s.add_dependency "github-markup", "~> 0.7"
+  s.add_dependency "makeup", "~>0"
   s.add_dependency "htmlentities", "~> 4.3"
   s.add_dependency "json", "~> 1.7"
   s.add_dependency "mime-types", "~> 1.19"

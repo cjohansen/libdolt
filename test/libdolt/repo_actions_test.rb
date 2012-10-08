@@ -17,7 +17,7 @@
 #++
 require "test_helper"
 require "libdolt/repo_actions"
-require "libdolt/async/when"
+require "when"
 require "ostruct"
 
 class Repository
@@ -36,7 +36,7 @@ class Repository
 
   private
   def stub
-    @deferred = When::Deferred.new
+    @deferred = When.defer
     @deferred.promise
   end
 end

@@ -17,36 +17,35 @@
 #++
 require "em_rugged/repository"
 require "em_pessimistic/deferrable_child_process"
-require "em/deferrable"
 require "libdolt/git/blame"
 require "libdolt/git/commit"
 require "libdolt/git/submodule"
 require "libdolt/git/tree"
-require "libdolt/async/when"
+require "when"
 
 module Dolt
   module Git
     class Repository < EMRugged::Repository
       def submodules(ref)
-        d = EventMachine::DefaultDeferrable.new
+        d = When.defer
         gm = rev_parse("#{ref}:.gitmodules")
         gm.callback do |config|
-          d.succeed(Dolt::Git::Submodule.parse_config(config.content))
+          d.resolve(Dolt::Git::Submodule.parse_config(config.content))
         end
         # Fails if .gitmodules cannot be found, which means no submodules
-        gm.errback { |err| d.succeed([]) }
+        gm.errback { |err| d.resolve([]) }
         d
       end
 
       def tree(ref, path)
-        d = EventMachine::DefaultDeferrable.new
+        d = When.defer
         rp = rev_parse("#{ref}:#{path}")
         rp.callback do |tree|
-          break d.fail(StandardError.new("Not a tree")) unless tree.is_a?(Rugged::Tree)
-          break d.succeed(tree) if !tree.find { |e| e[:type].nil? }
+          break d.reject(StandardError.new("Not a tree")) unless tree.is_a?(Rugged::Tree)
+          break d.resolve(tree) if !tree.find { |e| e[:type].nil? }
           annotate_submodules(ref, path, d, tree)
         end
-        rp.errback { |err| d.fail(err) }
+        rp.errback { |err| d.reject(err) }
         d
       end
 
@@ -61,18 +60,18 @@ module Dolt
       end
 
       def tree_history(ref, path, limit = 1)
-        d = EventMachine::DefaultDeferrable.new
+        d = When.defer
         rp = rev_parse("#{ref}:#{path}")
-        rp.errback { |err| d.fail(err) }
+        rp.errback { |err| d.reject(err) }
         rp.callback do |tree|
           if tree.class != Rugged::Tree
             message = "#{ref}:#{path} is not a tree (#{tree.class.to_s})"
-            break d.fail(Exception.new(message))
+            break d.reject(Exception.new(message))
           end
 
           building = build_history(path || "./", ref, tree, limit)
-          building.callback { |history| d.succeed(history) }
-          building.errback { |err| d.fail(err) }
+          building.callback { |history| d.resolve(history) }
+          building.errback { |err| d.reject(err) }
         end
         d
       end
@@ -85,14 +84,14 @@ module Dolt
       end
 
       def build_history(path, ref, entries, limit)
-        d = EventMachine::DefaultDeferrable.new
+        d = When.defer
         resolve = lambda { |p| path == "" ? p : File.join(path, p) }
         progress = When.all(entries.map do |e|
                               entry_history(ref, resolve.call(e[:name]), limit)
                             end)
-        progress.errback { |e| d.fail(e) }
+        progress.errback { |e| d.reject(e) }
         progress.callback do |history|
-          d.succeed(entries.map { |e| e.merge({ :history => history.shift }) })
+          d.resolve(entries.map { |e| e.merge({ :history => history.shift }) })
         end
         d
       end
@@ -111,21 +110,21 @@ module Dolt
             entry
           end
 
-          deferrable.succeed(Dolt::Git::Tree.new(tree.oid, entries))
+          deferrable.resolve(Dolt::Git::Tree.new(tree.oid, entries))
         end
       end
 
       def deferred_method(cmd, &block)
-        d = EventMachine::DefaultDeferrable.new
+        d = When.defer
         cmd = git(cmd)
         p = EMPessimistic::DeferrableChildProcess.open(cmd)
 
         p.callback do |output, status|
-          d.succeed(block.call(output, status))
+          d.resolve(block.call(output, status))
         end
 
         p.errback do |stderr, status|
-          d.fail(stderr)
+          d.reject(stderr)
         end
 
         d

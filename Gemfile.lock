@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    libdolt (0.6.0)
+    libdolt (0.6.1)
       em_pessimistic (~> 0.1)
       em_rugged (~> 0.1.2)
       eventmachine (~> 1.0)
@@ -10,6 +10,7 @@ PATH
       makeup (~> 0)
       mime-types (~> 1.19)
       tzinfo (~> 0.3)
+      when (~> 0)
 
 GEM
   remote: http://rubygems.org/
@@ -18,7 +19,7 @@ GEM
       eventmachine
     em_pessimistic (0.1.2)
       eventmachine (~> 1.0)
-    em_rugged (0.1.3)
+    em_rugged (0.1.5)
       eventmachine (~> 1.0)
       rugged (= 0.17.0.b6)
     eventmachine (1.0.0)
@@ -42,6 +43,7 @@ GEM
     tiltout (1.0.0)
       tilt (~> 1.3)
     tzinfo (0.3.33)
+    when (0.1.0)
     yajl-ruby (1.1.0)
 
 PLATFORMS

@@ -23,10 +23,10 @@ module Dolt
         dirs = path.split("/")
         filename = dirs.pop
         dir_html = accumulate_dirs(dirs, repository, ref)
-        url = repo_url(repository, "/tree/#{ref}")
+        url = tree_url(repository, ref)
         <<-HTML
           <ul class="breadcrumb">
-            <li><a href="#{url}:"><i class="icon icon-file"></i> /</a></li>
+            <li><a href="#{url}"><i class="icon icon-file"></i> /</a></li>
             #{dir_html}<li class="active">#{filename}</li>
           </ul>
         HTML
@@ -38,7 +38,7 @@ module Dolt
         divider = "<span class=\"divider\">/</span>"
         dir_html = dirs.inject("") do |html, dir|
           accumulated << dir
-          url = repo_url(repository, "/tree/#{ref}:#{accumulated.join('/')}")
+          url = tree_url(repository, ref, accumulated.join('/'))
           "#{html}<li><a href=\"#{url}\">#{dir}#{divider}</a></li>"
         end
       end

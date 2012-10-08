@@ -21,6 +21,7 @@ require "libdolt/view/breadcrumb"
 describe Dolt::View::Breadcrumb do
   include Dolt::Html
   include Dolt::View::SingleRepository
+  include Dolt::View::Urls
   include Dolt::View::Breadcrumb
 
   it "renders li element for root" do

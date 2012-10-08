@@ -17,49 +17,13 @@
 #++
 require "test_helper"
 require "libdolt/view/single_repository"
-require "libdolt/view/multi_repository"
 require "libdolt/view/blob"
+require "libdolt/view/urls"
 
 describe Dolt::View::Blob do
   include Dolt::View::Blob
-
-  describe "single repo mode" do
-    include Dolt::View::SingleRepository
-
-    it "returns blame url" do
-      url = blame_url("myrepo", "master", "some/path")
-      assert_equal "/blame/master:some/path", url
-    end
-
-    it "returns history url" do
-      url = history_url("myrepo", "master", "some/path")
-      assert_equal "/history/master:some/path", url
-    end
-
-    it "returns raw url" do
-      url = raw_url("myrepo", "master", "some/path")
-      assert_equal "/raw/master:some/path", url
-    end
-  end
-
-  describe "multi repo mode" do
-    include Dolt::View::MultiRepository
-
-    it "returns blame url" do
-      url = blame_url("myrepo", "master", "some/path")
-      assert_equal "/myrepo/blame/master:some/path", url
-    end
-
-    it "returns history url" do
-      url = history_url("myrepo", "master", "some/path")
-      assert_equal "/myrepo/history/master:some/path", url
-    end
-
-    it "returns raw url" do
-      url = raw_url("myrepo", "master", "some/path")
-      assert_equal "/myrepo/raw/master:some/path", url
-    end
-  end
+  include Dolt::View::Urls
+  include Dolt::View::SingleRepository
 
   describe "#multiline" do
     it "adds line number markup to code" do
@@ -89,8 +53,6 @@ describe Dolt::View::Blob do
   end
 
   describe "#format_binary_blob" do
-    include Dolt::View::SingleRepository
-
     it "renders link to binary blob" do
       content = "GIF89aK\000 \000\367\000\000\266\270\274\335\336\337\214"
       html = format_binary_blob("some/file.gif", content, "gitorious", "master")
@@ -100,8 +62,6 @@ describe Dolt::View::Blob do
   end
 
   describe "#format_blob" do
-    include Dolt::View::SingleRepository
-
     it "renders link to binary blob" do
       content = "GIF89aK\000 \000\367\000\000\266\270\274\335\336\337\214"
       html = format_blob("file.gif", content, "gitorious", "master")

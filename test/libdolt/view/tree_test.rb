@@ -17,17 +17,21 @@
 #++
 require "test_helper"
 require "libdolt/view/single_repository"
+require "libdolt/view/multi_repository"
 require "libdolt/view/object"
 require "libdolt/view/tree"
+require "libdolt/view/urls"
 require "ostruct"
 
 describe Dolt::View::Tree do
   include Dolt::Html
-  include Dolt::View::SingleRepository
   include Dolt::View::Object
   include Dolt::View::Tree
+  include Dolt::View::Urls
 
   describe "#tree_entries" do
+    include Dolt::View::SingleRepository
+
     before do
       async = { :name => "async", :type => :tree }
       disk_repo_resolver = { :type => :blob, :name => "disk_repo_resolver.rb" }
@@ -132,6 +136,8 @@ describe Dolt::View::Tree do
   end
 
   describe "#tree_context" do
+    include Dolt::View::SingleRepository
+
     def context(path, maxdepth = nil)
       tree_context("gitorious", "master", accumulate_path(partition_path(path, maxdepth)))
     end
@@ -192,5 +198,49 @@ describe Dolt::View::Tree do
       assert_equal "<a href=\"/tree/master:src/phorkie\">/ phorkie</a>", links[2]
       assert_equal "<a href=\"/tree/master:src/phorkie/Database\">/ Database</a>", links[3]
     end
+  end
+
+  describe "single repo mode" do
+    include Dolt::View::SingleRepository
+
+    it "returns blob url" do
+      object = { :type => "blob", :name => "Gemfile" }
+      url = object_url("myrepo", "master", "", object)
+      assert_equal "/blob/master:Gemfile", url
+    end
+
+    it "returns tree url" do
+      object = { :type => "tree", :name => "models" }
+      url = object_url("myrepo", "master", "app", object)
+      assert_equal "/tree/master:app/models", url
+    end
+
+    it "returns blob url in directory" do
+      object = { :type => "blob", :name => "Gemfile" }
+      url = object_url("myrepo", "master", "lib/mything", object)
+      assert_equal "/blob/master:lib/mything/Gemfile", url
+    end
+  end
+
+  describe "multi repo mode" do
+    include Dolt::View::MultiRepository
+
+    it "returns blob url" do
+      object = { :type => "blob", :name => "Gemfile" }
+      url = object_url("myrepo", "master", "", object)
+      assert_equal "/myrepo/blob/master:Gemfile", url
+    end
+
+    it "returns blob url in directory" do
+      object = { :type => "blob", :name => "Gemfile" }
+      url = object_url("myrepo", "master", "lib/mything", object)
+      assert_equal "/myrepo/blob/master:lib/mything/Gemfile", url
+    end
+  end
+
+  it "links submodule object to submodule" do
+    url = "git://gitorious.org/gitorious/ui3.git"
+    object = { :type => :submodule, :url => url }
+    assert_equal url, object_url("gitorious", "master", "vendor", object)
   end
 end

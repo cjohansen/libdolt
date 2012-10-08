@@ -1,4 +1,3 @@
-
 # encoding: utf-8
 #--
 #   Copyright (C) 2012 Gitorious AS
@@ -17,14 +16,32 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-require "libdolt/version"
-require "libdolt/disk_repo_resolver"
-require "libdolt/gitorious_repo_resolver"
-require "libdolt/repo_actions"
-require "libdolt/view"
-
 module Dolt
-  def self.template_dir
-    File.join(File.dirname(__FILE__), "..", "views")
+  module View
+    module Urls
+      def tree_url(repository, ref, path = "")
+        repo_url(repository, "/tree/#{ref}:#{path}")
+      end
+
+      def blob_url(repository, ref, path)
+        repo_url(repository, "/blob/#{ref}:#{path}")
+      end
+
+      def blame_url(repository, ref, path)
+        repo_url(repository, "/blame/#{ref}:#{path}")
+      end
+
+      def history_url(repository, ref, path)
+        repo_url(repository, "/history/#{ref}:#{path}")
+      end
+
+      def raw_url(repository, ref, path)
+        repo_url(repository, "/raw/#{ref}:#{path}")
+      end
+
+      def tree_history_url(repository, ref, path)
+        repo_url(repository, "/tree_history/#{ref}:#{path}")
+      end
+    end
   end
 end

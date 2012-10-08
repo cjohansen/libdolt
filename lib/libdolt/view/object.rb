@@ -19,16 +19,6 @@
 module Dolt
   module View
     module Object
-      def object_url(repository, ref, path, object)
-        return object[:url] if object[:type] == :submodule
-        url = "/#{object[:type]}/#{ref}:#{object_path(path, object)}"
-        repo_url(repository, url)
-      end
-
-      def object_path(root, object)
-        File.join(root, object[:name]).sub(/^\//, "")
-      end
-
       def object_icon_class(entry)
         case entry[:type]
         when :blob

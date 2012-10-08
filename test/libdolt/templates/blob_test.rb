@@ -98,6 +98,7 @@ describe "blob template" do
       @helpers = [Dolt::View::SingleRepository,
                   Dolt::View::Breadcrumb,
                   Dolt::View::Blob,
+                  Dolt::View::Urls,
                   Dolt::View::SmartBlobRenderer]
     end
 

@@ -36,6 +36,7 @@ module Dolt
       root = File.join(File.dirname(__FILE__), "..", "views")
       renderer = Tiltout.new(root, options)
       renderer.helper(helpers || [Dolt::View::MultiRepository,
+                                  Dolt::View::Urls,
                                   Dolt::View::Object,
                                   Dolt::View::Blob,
                                   Dolt::View::Tree,

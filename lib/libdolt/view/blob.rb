@@ -51,26 +51,6 @@ The content you're attempting to browse appears to be binary.
         multiline(entityfy(content))
       end
 
-      def blob_url(repository, ref, path)
-        repo_url(repository, "/blob/#{ref}:#{path}")
-      end
-
-      def blame_url(repository, ref, path)
-        repo_url(repository, "/blame/#{ref}:#{path}")
-      end
-
-      def history_url(repository, ref, path)
-        repo_url(repository, "/history/#{ref}:#{path}")
-      end
-
-      def raw_url(repository, ref, path)
-        repo_url(repository, "/raw/#{ref}:#{path}")
-      end
-
-      def tree_history_url(repository, ref, path)
-        repo_url(repository, "/tree_history/#{ref}:#{path}")
-      end
-
       def format_whitespace(text)
         text
       end

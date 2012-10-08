@@ -21,7 +21,7 @@ require "libdolt/view/blob"
 require "libdolt/view/binary_blob_embedder"
 
 describe Dolt::View::BinaryBlobEmbedder do
-  include Dolt::View::Blob
+  include Dolt::View::Urls
   include Dolt::View::BinaryBlobEmbedder
   include Dolt::View::SingleRepository
 

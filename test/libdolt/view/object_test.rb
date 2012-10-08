@@ -23,44 +23,6 @@ require "libdolt/view/object"
 describe Dolt::View::Object do
   include Dolt::View::Object
 
-  describe "single repo mode" do
-    include Dolt::View::SingleRepository
-
-    it "returns blob url" do
-      object = { :type => "blob", :name => "Gemfile" }
-      url = object_url("myrepo", "master", "", object)
-      assert_equal "/blob/master:Gemfile", url
-    end
-
-    it "returns tree url" do
-      object = { :type => "tree", :name => "models" }
-      url = object_url("myrepo", "master", "app", object)
-      assert_equal "/tree/master:app/models", url
-    end
-
-    it "returns blob url in directory" do
-      object = { :type => "blob", :name => "Gemfile" }
-      url = object_url("myrepo", "master", "lib/mything", object)
-      assert_equal "/blob/master:lib/mything/Gemfile", url
-    end
-  end
-
-  describe "multi repo mode" do
-    include Dolt::View::MultiRepository
-
-    it "returns blob url" do
-      object = { :type => "blob", :name => "Gemfile" }
-      url = object_url("myrepo", "master", "", object)
-      assert_equal "/myrepo/blob/master:Gemfile", url
-    end
-
-    it "returns blob url in directory" do
-      object = { :type => "blob", :name => "Gemfile" }
-      url = object_url("myrepo", "master", "lib/mything", object)
-      assert_equal "/myrepo/blob/master:lib/mything/Gemfile", url
-    end
-  end
-
   describe "#object_icon_class" do
     it "returns blob icon type" do
       assert_equal "icon-file", object_icon_class({ :type => :blob })
@@ -73,11 +35,5 @@ describe Dolt::View::Object do
     it "returns submodule icon type" do
       assert_equal "icon-hdd", object_icon_class({ :type => :submodule })
     end
-  end
-
-  it "links submodule object to submodule" do
-    url = "git://gitorious.org/gitorious/ui3.git"
-    object = { :type => :submodule, :url => url }
-    assert_equal url, object_url("gitorious", "master", "vendor", object)
   end
 end

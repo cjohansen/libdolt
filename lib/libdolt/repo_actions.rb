@@ -36,6 +36,16 @@ module Dolt
       repo_action(repo, ref, path, :tree, :tree, ref, path, &block)
     end
 
+    def tree_entry(repo, ref, path, &block)
+      repository = repo_resolver.resolve(repo)
+      d = repository.tree_entry(ref, path)
+      d.callback do |result|
+        key = result.class.to_s.match(/Blob/) ? :blob : :tree
+        block.call(nil, tpl_data(repo, ref, path, { key => result, :type => key }))
+      end
+      d.errback { |err| block.call(err, nil) }
+    end
+
     def blame(repo, ref, path, &block)
       repo_action(repo, ref, path, :blame, :blame, ref, path, &block)
     end

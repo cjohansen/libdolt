@@ -64,6 +64,31 @@ describe Dolt::Git::Repository do
     end
   end
 
+  describe "#tree_entry" do
+    it "includes submodule data for trees" do
+      @repository.tree_entry("3dc532f", "vendor").callback do |tree|
+        assert_equal({
+          :type => :submodule,
+          :filemode => 57344,
+          :name => "ui",
+          :oid => "d167e3e1c17a27e4cf459dd380670801b0659659",
+          :url => "git://gitorious.org/gitorious/ui3.git"
+        }, tree.entries.first)
+        done!
+      end
+      wait!
+    end
+
+    it "yields blob" do
+      @repository.tree_entry("3dc532f", "Gemfile").callback do |blob|
+        assert blob.is_a?(Rugged::Blob)
+        assert_equal "source \"http://rubygems.org\"\n\ngemspec\n", blob.content
+        done!
+      end
+      wait!
+    end
+  end
+
   describe "#blame" do
     it "returns deferrable" do
       deferrable = @repository.blame("master", "Gemfile")

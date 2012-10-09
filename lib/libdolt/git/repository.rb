@@ -37,16 +37,25 @@ module Dolt
         d
       end
 
-      def tree(ref, path)
-        d = When.defer
-        rp = rev_parse("#{ref}:#{path}")
-        rp.callback do |tree|
-          break d.reject(StandardError.new("Not a tree")) unless tree.is_a?(Rugged::Tree)
-          break d.resolve(tree) if !tree.find { |e| e[:type].nil? }
-          annotate_submodules(ref, path, d, tree)
+      def tree_entry(ref, path)
+        When.defer do |d|
+          rp = rev_parse("#{ref}:#{path}")
+          rp.callback { |object| annotate_tree(d, ref, path, object) }
+          rp.errback { |err| d.reject(err) }
         end
-        rp.errback { |err| d.reject(err) }
-        d
+      end
+
+      def tree(ref, path)
+        When.defer do |d|
+          rp = rev_parse("#{ref}:#{path}")
+          rp.callback do |object|
+            if !object.is_a?(Rugged::Tree)
+              next d.reject(StandardError.new("Not a tree"))
+            end
+            annotate_tree(d, ref, path, object)
+          end
+          rp.errback { |err| d.reject(err) }
+        end
       end
 
       def blame(ref, path)
@@ -96,7 +105,15 @@ module Dolt
         d
       end
 
-      def annotate_submodules(ref, path, deferrable, tree)
+      def annotate_tree(d, ref, path, object)
+        if object.class.to_s.match(/Blob/) || !object.find { |e| e[:type].nil? }
+          return d.resolve(object)
+        end
+
+        annotate_submodules(d, ref, path, object)
+      end
+
+      def annotate_submodules(deferrable, ref, path, tree)
         submodules(ref).callback do |submodules|
           entries = tree.entries.map do |entry|
             if entry[:type].nil?

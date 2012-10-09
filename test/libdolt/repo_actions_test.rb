@@ -24,6 +24,7 @@ class Repository
   attr_reader :name
   def initialize(name); @name = name; end
   def tree(ref, path); stub; end
+  def tree_entry(ref, path); stub; end
   def rev_parse(rev); stub; end
   def blame(ref, path); stub; end
   def log(ref, path, limit); stub; end
@@ -51,6 +52,8 @@ class Resolver
     repository
   end
 end
+
+class FakeBlob; end
 
 describe Dolt::RepoActions do
   before do
@@ -103,6 +106,41 @@ describe Dolt::RepoActions do
         :repository => "gitorious",
         :ref =>  "babd120",
         :path => "app"
+      }
+      assert_equal expected, data
+    end
+  end
+
+  describe "#tree_entry" do
+    it "yields tree, repo and ref to block" do
+      data = nil
+      @actions.tree_entry("gitorious", "babd120", "") { |err, d| data = d }
+      repo = @resolver.resolved.last
+      repo.resolve_promise "Tree"
+
+      expected = {
+        :tree => "Tree",
+        :repository => "gitorious",
+        :ref =>  "babd120",
+        :path => "",
+        :type => :tree
+      }
+      assert_equal expected, data
+    end
+
+    it "yields tree, repo and ref to block" do
+      data = nil
+      @actions.tree_entry("gitorious", "babd120", "Gemfile") { |err, d| data = d }
+      repo = @resolver.resolved.last
+      blob = FakeBlob.new
+      repo.resolve_promise(blob)
+
+      expected = {
+        :blob => blob,
+        :repository => "gitorious",
+        :ref =>  "babd120",
+        :path => "Gemfile",
+        :type => :blob
       }
       assert_equal expected, data
     end

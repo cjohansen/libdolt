@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    libdolt (0.6.2)
+    libdolt (0.7.0)
       em_pessimistic (~> 0.1)
       em_rugged (~> 0.1.2)
       eventmachine (~> 1.0)

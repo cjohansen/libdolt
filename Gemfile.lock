@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    libdolt (0.6.1)
+    libdolt (0.6.2)
       em_pessimistic (~> 0.1)
       em_rugged (~> 0.1.2)
       eventmachine (~> 1.0)
@@ -40,7 +40,7 @@ GEM
     redcarpet (2.1.1)
     rugged (0.17.0.b6)
     tilt (1.3.3)
-    tiltout (1.0.0)
+    tiltout (1.1.0)
       tilt (~> 1.3)
     tzinfo (0.3.33)
     when (0.1.0)

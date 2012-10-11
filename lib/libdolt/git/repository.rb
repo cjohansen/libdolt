@@ -59,7 +59,7 @@ module Dolt
       end
 
       def blame(ref, path)
-        deferred_method("blame -l -t -p #{ref} #{path}") do |output, s|
+        deferred_method("blame -l -t -p #{ref} -- #{path}") do |output, s|
           Dolt::Git::Blame.parse_porcelain(output)
         end
       end

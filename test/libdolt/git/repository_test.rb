@@ -103,6 +103,14 @@ describe Dolt::Git::Repository do
       end
       wait!
     end
+
+    it "separates tree-like and path" do
+      def @repository.git(cmd); @cmd = cmd; end
+      def @repository.cmd; @cmd; end
+      @repository.blame("master", "Gemfile").callback
+
+      assert_equal "blame -l -t -p master -- Gemfile", @repository.cmd
+    end
   end
 
   describe "#log" do

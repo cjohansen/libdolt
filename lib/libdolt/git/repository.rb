@@ -148,7 +148,7 @@ module Dolt
       end
 
       def git(cmd)
-        "git --git-dir #{subject.path} #{cmd}"
+        "git --git-dir #{path} #{cmd}"
       end
     end
   end

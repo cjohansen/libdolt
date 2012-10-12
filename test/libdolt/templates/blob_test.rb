@@ -34,7 +34,7 @@ describe "blob template" do
     renderer = prepare_renderer(options, helpers)
     renderer.render(:blob, {
                       :blob => blob,
-                      :repository => @repo,
+                      :repository_slug => @repo,
                       :ref => options[:ref] || "master",
                       :path => path
                     })

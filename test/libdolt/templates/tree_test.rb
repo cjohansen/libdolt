@@ -34,7 +34,7 @@ describe "tree template" do
     renderer = prepare_renderer(options)
     renderer.render(:tree, {
                       :tree => tree,
-                      :repository => @repo,
+                      :repository_slug => @repo,
                       :ref => options[:ref] || "master",
                       :path => path
                     })

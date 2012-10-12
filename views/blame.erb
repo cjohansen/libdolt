@@ -17,17 +17,17 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 %>
-<% @title = "Blame #{path} in #{repository}:master" %>
+<% @title = "Blame #{path} in #{repository_slug}:master" %>
 
 <div class="gts-file gts-browser">
   <div id="gts-ref-selector-ph"></div>
   <ul class="pull-right gts-blob-view">
-    <li><a href="<%= blob_url(repository, ref, path) %>">Blob content</a></li>
+    <li><a href="<%= blob_url(repository_slug, ref, path) %>">Blob content</a></li>
     <li class="active">Blame</li>
-    <li><a href="<%= history_url(repository, ref, path) %>">History</a></li>
-    <li><a href="<%= raw_url(repository, ref, path) %>">Raw blob</a></li>
+    <li><a href="<%= history_url(repository_slug, ref, path) %>">History</a></li>
+    <li><a href="<%= raw_url(repository_slug, ref, path) %>">Raw blob</a></li>
   </ul>
-  <%= breadcrumb(repository, ref, path) %>
+  <%= breadcrumb(repository_slug, ref, path) %>
   <table class="gts-code-listing">
     <% annotations = blame_annotations(blame) %>
     <% lines = blame_lines(path, blame) %>

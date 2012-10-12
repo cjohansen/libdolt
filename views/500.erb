@@ -19,4 +19,4 @@
 %>
 <h1><%= @title = "An error occurred" %></h1>
 <h2><%= error.respond_to?(:message) ? error.message : error %></h2>
-<p><a href="<%= tree_url(repository, ref, "") %>">Go back</a></p>
+<p><a href="<%= tree_url(repository_slug, ref, "") %>">Go back</a></p>

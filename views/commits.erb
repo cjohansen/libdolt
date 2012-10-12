@@ -2,12 +2,12 @@
 <div class="gts-browser">
   <div id="gts-ref-selector-ph"></div>
   <ul class="pull-right gts-blob-view">
-    <li><a href="<%= blob_url(repository, ref, path) %>">Blob content</a></li>
-    <li><a href="<%= blame_url(repository, ref, path) %>">Blame</a></li>
+    <li><a href="<%= blob_url(repository_slug, ref, path) %>">Blob content</a></li>
+    <li><a href="<%= blame_url(repository_slug, ref, path) %>">Blame</a></li>
     <li class="active">History</li>
-    <li><a href="<%= raw_url(repository, ref, path) %>">Raw blob</a></li>
+    <li><a href="<%= raw_url(repository_slug, ref, path) %>">Raw blob</a></li>
   </ul>
-  <%= breadcrumb(repository, ref, path) %>
+  <%= breadcrumb(repository_slug, ref, path) %>
   <% commits.each do |commit| %>
     <div class="gts-commit">
       <p class="gts-log-message">

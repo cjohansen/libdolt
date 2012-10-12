@@ -60,7 +60,7 @@ module Dolt
       d.callback do |refs|
         names = refs.map(&:name)
         block.call(nil, {
-                     :repository => repo,
+                     :repository_slug => repo,
                      :tags => stripped_ref_names(names, :tags),
                      :heads => stripped_ref_names(names, :heads)
                    })
@@ -90,7 +90,7 @@ module Dolt
 
     def tpl_data(repo, ref, path, locals = {})
       {
-        :repository => repo,
+        :repository_slug => repo,
         :path => path,
         :ref => ref
       }.merge(locals)

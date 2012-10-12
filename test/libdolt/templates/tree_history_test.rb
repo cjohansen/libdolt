@@ -83,7 +83,7 @@ describe "tree_history template" do
   end
 
   it "renders JSON" do
-    data = { "tree" => @tree, "repository" => @repo, "ref" => "master", "path" => "" }
+    data = { "tree" => @tree, "repository_slug" => @repo, "ref" => "master", "path" => "" }
     json = @renderer.render(:tree_history, data)
 
     assert_equal @tree_array, JSON.parse(json)

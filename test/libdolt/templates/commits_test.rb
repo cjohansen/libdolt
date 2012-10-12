@@ -43,7 +43,7 @@ describe "commits template" do
     renderer = prepare_renderer(options)
     renderer.render(:commits, {
                       :commits => commits,
-                      :repository => @repo,
+                      :repository_slug => @repo,
                       :ref => options[:ref] || "master",
                       :path => path
                     })

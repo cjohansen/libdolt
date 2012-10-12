@@ -78,7 +78,7 @@ describe Dolt::RepoActions do
 
       assert_equal({
                      :blob => "Blob",
-                     :repository => "gitorious",
+                     :repository_slug => "gitorious",
                      :ref =>  "babd120",
                      :path => "app"
                    }, data)
@@ -103,7 +103,7 @@ describe Dolt::RepoActions do
 
       expected = {
         :tree => "Tree",
-        :repository => "gitorious",
+        :repository_slug => "gitorious",
         :ref =>  "babd120",
         :path => "app"
       }
@@ -120,7 +120,7 @@ describe Dolt::RepoActions do
 
       expected = {
         :tree => "Tree",
-        :repository => "gitorious",
+        :repository_slug => "gitorious",
         :ref =>  "babd120",
         :path => "",
         :type => :tree
@@ -137,7 +137,7 @@ describe Dolt::RepoActions do
 
       expected = {
         :blob => blob,
-        :repository => "gitorious",
+        :repository_slug => "gitorious",
         :ref =>  "babd120",
         :path => "Gemfile",
         :type => :blob
@@ -164,7 +164,7 @@ describe Dolt::RepoActions do
 
       expected = {
         :blame => "Blame",
-        :repository => "gitorious",
+        :repository_slug => "gitorious",
         :ref =>  "babd120",
         :path => "app"
       }
@@ -190,7 +190,7 @@ describe Dolt::RepoActions do
 
       expected = {
         :commits => "History",
-        :repository => "gitorious",
+        :repository_slug => "gitorious",
         :ref =>  "babd120",
         :path => "app"
       }
@@ -216,7 +216,7 @@ describe Dolt::RepoActions do
       repo.resolve_promise(@refs)
 
       expected = {
-        :repository => "gitorious",
+        :repository_slug => "gitorious",
         :heads => ["libgit2", "master"],
         :tags => ["v0.2.1", "v0.2.0"]
       }
@@ -263,7 +263,7 @@ describe Dolt::RepoActions do
       repo.resolve_promise(@tree)
 
       expected = {
-        :repository => "gitorious",
+        :repository_slug => "gitorious",
         :ref => "master",
         :path => "",
         :tree => @tree

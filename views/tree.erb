@@ -22,7 +22,7 @@
 levels = accumulate_path(partition_path(path, respond_to?(:maxdepth) ? maxdepth : nil))
 %>
 <div id="gts-ref-selector-ph"></div>
-<table class="table table-striped gts-tree-explorer" data-gts-tree-history="<%= tree_history_url(repository, ref, path) %>">
+<table class="table table-striped gts-tree-explorer" data-gts-tree-history="<%= tree_history_url(repository_slug, ref, path) %>">
   <thead>
     <tr>
       <th colspan="<%= tree_table_padding_width(levels) + 1 %>">File</th>
@@ -31,12 +31,12 @@ levels = accumulate_path(partition_path(path, respond_to?(:maxdepth) ? maxdepth 
     </tr>
   </thead>
   <tbody>
-    <%= tree_context(repository, ref, levels) %>
+    <%= tree_context(repository_slug, ref, levels) %>
     <% tree_entries(tree).each do |object| %>
       <tr>
         <%= tree_table_padding_td(levels) %>
         <td class="gts-name">
-          <a href="<%= object_url(repository, ref, path, object) %>">
+          <a href="<%= object_url(repository_slug, ref, path, object) %>">
             <i class="icon <%= object_icon_class(object) %>"></i>
             <%= object[:name] %>
           </a>

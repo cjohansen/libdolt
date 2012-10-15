@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency "eventmachine", "~>1.0"
   s.add_dependency "when", "~>0"
   s.add_dependency "em_pessimistic", "~>0.1"
-  s.add_dependency "em_rugged", "~> 0.1.2"
+  s.add_dependency "em_rugged", "~> 0.3"
   s.add_dependency "tzinfo", "~> 0.3"
   s.add_dependency "makeup", "~>0"
   s.add_dependency "htmlentities", "~> 4.3"
@@ -26,8 +26,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "minitest", "~> 2.0"
   s.add_development_dependency "em-minitest-spec", "~> 1.1"
   s.add_development_dependency "rake", "~> 0.9"
-  s.add_development_dependency "redcarpet"
-  s.add_development_dependency "tiltout", "~>1"
+  s.add_development_dependency "redcarpet", "2.2.0"
+  s.add_development_dependency "tiltout", "~>1.2"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test}/*`.split("\n")

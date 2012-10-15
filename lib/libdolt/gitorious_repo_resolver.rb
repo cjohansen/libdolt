@@ -22,7 +22,7 @@ module Dolt
       @repository = repository
     end
 
-    def resolve(repo)
+    def resolve(repo = nil)
       Dolt::Git::Repository.new(@repository.full_repository_path)
     end
   end

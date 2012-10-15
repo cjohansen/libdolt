@@ -22,10 +22,15 @@ require "ostruct"
 
 class Repository
   attr_reader :name
-  def initialize(name); @name = name; end
+  def initialize(name)
+    @name = name
+    @refs = {}
+  end
+
   def tree(ref, path); stub; end
   def tree_entry(ref, path); stub; end
   def rev_parse(rev); stub; end
+  def rev_parse_oid_sync(ref); @refs[ref] || nil; end
   def blame(ref, path); stub; end
   def log(ref, path, limit); stub; end
   def refs; stub; end
@@ -33,6 +38,10 @@ class Repository
 
   def resolve_promise(blob)
     @deferred.resolve(blob)
+  end
+
+  def stub_ref(name, ref)
+    @refs[name] = ref
   end
 
   private
@@ -213,12 +222,16 @@ describe Dolt::RepoActions do
       @actions.refs("gitorious") { |err, d| data = d }
 
       repo = @resolver.resolved.last
+      repo.stub_ref("refs/tags/v0.2.0", "a" * 40)
+      repo.stub_ref("refs/tags/v0.2.1", "b" * 40)
+      repo.stub_ref("refs/heads/libgit2", "c" * 40)
+      repo.stub_ref("refs/heads/master", "d" * 40)
       repo.resolve_promise(@refs)
 
       expected = {
         :repository_slug => "gitorious",
-        :heads => ["libgit2", "master"],
-        :tags => ["v0.2.1", "v0.2.0"]
+        :heads => [["libgit2", "c" * 40], ["master", "d" * 40]],
+        :tags => [["v0.2.1", "b" * 40], ["v0.2.0", "a" * 40]]
       }
       assert_equal expected, data
     end

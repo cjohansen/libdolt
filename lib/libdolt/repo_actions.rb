@@ -61,8 +61,8 @@ module Dolt
         names = refs.map(&:name)
         block.call(nil, {
                      :repository_slug => repo,
-                     :tags => stripped_ref_names(names, :tags),
-                     :heads => stripped_ref_names(names, :heads)
+                     :tags => expand_refs(repository, names, :tags),
+                     :heads => expand_refs(repository, names, :heads)
                    })
       end
       d.errback { |err| block.call(err, nil) }
@@ -96,9 +96,9 @@ module Dolt
       }.merge(locals)
     end
 
-    def stripped_ref_names(names, type)
+    def expand_refs(repository, names, type)
       names.select { |n| n =~ /#{type}/ }.map do |n|
-        n.sub(/^refs\/#{type}\//, "")
+        [n.sub(/^refs\/#{type}\//, ""), repository.rev_parse_oid_sync(n)]
       end
     end
   end

@@ -17,6 +17,6 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 %>{
-    "heads": [<%= heads.map { |n| "\"#{n}\"" }.join(",") %>],
-    "tags": [<%= tags.map { |n| "\"#{n}\"" }.join(",") %>]
+    "heads": [<%= heads.map { |head| "[\"#{head.first}\", \"#{head.last}\"]" }.join(",") %>],
+    "tags": [<%= tags.map { |tag| "[\"#{tag.first}\", \"#{tag.last}\"]" }.join(",") %>]
 }

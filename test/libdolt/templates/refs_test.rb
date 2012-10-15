@@ -28,7 +28,10 @@ describe "refs template" do
   end
 
   it "renders JSON" do
-    data = { "heads" => ["libgit2", "master"], "tags" => ["v2.1.0"] }
+    data = {
+      "heads" => [["libgit2", "0123456"], ["master", "1234567"]],
+      "tags" => [["v2.1.0", "2345678"]]
+    }
     html = @renderer.render(:refs, data)
 
     assert_equal data, JSON.parse(html)

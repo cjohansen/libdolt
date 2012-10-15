@@ -1,13 +1,13 @@
 PATH
   remote: .
   specs:
-    libdolt (0.8.0)
+    libdolt (0.9.0)
       em_pessimistic (~> 0.1)
       em_rugged (~> 0.3)
       eventmachine (~> 1.0)
       htmlentities (~> 4.3)
       json (~> 1.7)
-      makeup (~> 0)
+      makeup (~> 0.2)
       mime-types (~> 1.19)
       tzinfo (~> 0.3)
       when (~> 0)
@@ -26,7 +26,7 @@ GEM
     github-markup (0.7.4)
     htmlentities (4.3.1)
     json (1.7.5)
-    makeup (0.1.1)
+    makeup (0.2.0)
       github-markup (~> 0.7)
       htmlentities (~> 4.3)
       pygments.rb (~> 0.2)

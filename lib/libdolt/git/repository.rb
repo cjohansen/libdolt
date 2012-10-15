@@ -69,20 +69,32 @@ module Dolt
       end
 
       def tree_history(ref, path, limit = 1)
-        d = When.defer
-        rp = rev_parse("#{ref}:#{path}")
-        rp.errback { |err| d.reject(err) }
-        rp.callback do |tree|
-          if tree.class != Rugged::Tree
-            message = "#{ref}:#{path} is not a tree (#{tree.class.to_s})"
-            break d.reject(Exception.new(message))
-          end
+        When.defer do |d|
+          rp = rev_parse("#{ref}:#{path}")
+          rp.errback { |err| d.reject(err) }
+          rp.callback do |tree|
+            if tree.class != Rugged::Tree
+              message = "#{ref}:#{path} is not a tree (#{tree.class.to_s})"
+              break d.reject(Exception.new(message))
+            end
 
-          building = build_history(path || "./", ref, tree, limit)
-          building.callback { |history| d.resolve(history) }
-          building.errback { |err| d.reject(err) }
+            building = build_history(path || "./", ref, tree, limit)
+            building.callback { |history| d.resolve(history) }
+            building.errback { |err| d.reject(err) }
+          end
         end
-        d
+      end
+
+      def readme(ref)
+        When.defer do |d|
+          t = self.tree(ref, "")
+          t.callback do |tree|
+            d.resolve(tree.entries.select do |e|
+                        e[:type] == :blob && e[:name].match(/readme/i)
+                      end)
+          end
+          t.errback { |err| d.resolve([]) }
+        end
       end
 
       private

@@ -18,6 +18,7 @@
 require "test_helper"
 require "libdolt/git/repository"
 require "time"
+require "ostruct"
 
 describe Dolt::Git::Repository do
   include EM::MiniTest::Spec
@@ -211,6 +212,80 @@ describe Dolt::Git::Repository do
 
       promise.errback do |err|
         puts "FAILED! #{err.inspect}"
+      end
+
+      wait!
+    end
+  end
+
+  describe "#readme" do
+    it "returns deferrable" do
+      deferrable = @repository.readme("master")
+      assert deferrable.respond_to?(:callback)
+      assert deferrable.respond_to?(:errback)
+    end
+
+    it "yields single readme" do
+      def @repository.tree(ref, path)
+        entries = [{ :type => :blob, :name => "Readme" },
+                   { :type => :blob, :name => "file.txt" },
+                   { :type => :tree, :name => "dir" }]
+        if ref == "master" && path == ""
+          When.resolve(OpenStruct.new(:entries => entries))
+        else
+          When.reject("Wrong ref/path")
+        end
+      end
+
+      @repository.readme("master").callback do |readmes|
+        assert_equal 1, readmes.length
+        assert_equal "Readme", readmes.first[:name]
+        done!
+      end
+
+      wait!
+    end
+
+    it "does not yield trees" do
+      def @repository.tree(ref, path)
+        entries = [{ :type => :tree, :name => "Readme" },
+                   { :type => :blob, :name => "file.txt" },
+                   { :type => :tree, :name => "dir" }]
+        When.resolve(OpenStruct.new(:entries => entries))
+      end
+
+      @repository.readme("master").callback do |readmes|
+        assert_equal 0, readmes.length
+        done!
+      end
+
+      wait!
+    end
+
+    it "yields all readmes" do
+      def @repository.tree(ref, path)
+        entries = [{ :type => :blob, :name => "Readme.rdoc" },
+                   { :type => :blob, :name => "readme" },
+                   { :type => :blob, :name => "Readme.md" }]
+        When.resolve(OpenStruct.new(:entries => entries))
+      end
+
+      @repository.readme("master").callback do |readmes|
+        assert_equal 3, readmes.length
+        done!
+      end
+
+      wait!
+    end
+
+    it "yields empty array of readmes when promise rejects" do
+      def @repository.tree(ref, path)
+        When.reject(OpenStruct.new({ :message => "Unknown reason" }))
+      end
+
+      @repository.readme("master").callback do |readmes|
+        assert_equal 0, readmes.length
+        done!
       end
 
       wait!

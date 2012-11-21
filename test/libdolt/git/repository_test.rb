@@ -158,7 +158,6 @@ describe Dolt::Git::Repository do
 
     it "yields tree with history" do
       promise = @repository.tree_history("48ffbf7", "")
-
       promise.callback do |log|
         assert_equal 11, log.length
         expected = {

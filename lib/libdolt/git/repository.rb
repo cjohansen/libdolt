@@ -75,7 +75,7 @@ module Dolt
           rp.callback do |tree|
             if tree.class != Rugged::Tree
               message = "#{ref}:#{path} is not a tree (#{tree.class.to_s})"
-              break d.reject(Exception.new(message))
+              next d.reject(Exception.new(message))
             end
 
             building = build_history(path || "./", ref, tree, limit)

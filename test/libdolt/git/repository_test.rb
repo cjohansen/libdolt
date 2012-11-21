@@ -204,7 +204,6 @@ describe Dolt::Git::Repository do
                                      :message => ""
                                    }]
                     }]
-
         assert_equal expected, log
         done!
       end

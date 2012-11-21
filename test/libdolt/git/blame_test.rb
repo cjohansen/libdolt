@@ -108,10 +108,10 @@ beb65bee5619c651532179b19421363ead2c2a44 22 22
       assert_equal "906d67b4f3e5de7364ba9b57d174d8998d53ced6", chunk[:oid]
       assert_equal "Christian Johansen", author[:name]
       assert_equal "christian@cjohansen.no", author[:mail]
-      assert_equal "2012-09-10 17:07:39", author[:time].strftime("%Y-%m-%d %H:%M:%S")
+      assert_equal "2012-09-10 15:07:39", author[:time].strftime("%Y-%m-%d %H:%M:%S")
       assert_equal "Christian Johansen", committer[:name]
       assert_equal "christian@cjohansen.no", committer[:mail]
-      assert_equal "2012-09-10 17:07:39", committer[:time].strftime("%Y-%m-%d %H:%M:%S")
+      assert_equal "2012-09-10 15:07:39", committer[:time].strftime("%Y-%m-%d %H:%M:%S")
       assert_equal "Working Moron server for viewing blobs", chunk[:summary]
     end
 

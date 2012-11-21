@@ -98,7 +98,7 @@ module Dolt
           {
             :name => extract(lines, "#{type}"),
             :mail => extract(lines, "#{type}-mail").gsub(/[<>]/, ""),
-            :time => (Time.at(extract(lines, "#{type}-time").to_i) +
+            :time => (Time.at(extract(lines, "#{type}-time").to_i).utc +
                       Time.zone_offset(extract(lines, "#{type}-tz")))
           }
         end

@@ -1,5 +1,9 @@
 # Dolt - The Git project browser
 
+<a href="http://travis-ci.org/cjohansen/libdolt" class="travis">
+  <img src="https://secure.travis-ci.org/cjohansen/libdolt.png">
+</a>
+
 Dolt is a stand-alone Git repository browser. It can be used to explore repos in
 your browser of choice and features syntax highlighting with
 [Pygments](http://pygments.org/),

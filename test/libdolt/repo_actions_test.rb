@@ -62,6 +62,16 @@ class Resolver
   end
 end
 
+class MetaResolver < Resolver
+  def resolve(repo)
+    repository = super
+    def repository.meta
+      "Meta data is cool"
+    end
+    repository
+  end
+end
+
 class FakeBlob; end
 
 describe Dolt::RepoActions do
@@ -282,6 +292,19 @@ describe Dolt::RepoActions do
         :tree => @tree
       }
       assert_equal expected, data
+    end
+  end
+
+  describe "repository meta data" do
+    it "is yielded with other data to block" do
+      resolver = MetaResolver.new
+      actions = Dolt::RepoActions.new(resolver)
+      data = nil
+      actions.blob("gitorious", "babd120", "app") { |err, d| data = d }
+
+      resolver.resolved.last.resolve_promise("Blob")
+
+      assert_equal "Meta data is cool", data[:repository_meta]
     end
   end
 end

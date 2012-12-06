@@ -37,11 +37,11 @@ module Dolt
     end
 
     def tree_entry(repo, ref, path, &block)
-      repository = repo_resolver.resolve(repo)
+      repository = resolve_repository(repo)
       d = repository.tree_entry(ref, path)
       d.callback do |result|
         key = result.class.to_s.match(/Blob/) ? :blob : :tree
-        block.call(nil, tpl_data(repo, ref, path, { key => result, :type => key }))
+        block.call(nil, tpl_data(repository, ref, path, { key => result, :type => key }))
       end
       d.errback { |err| block.call(err, nil) }
     end
@@ -55,15 +55,14 @@ module Dolt
     end
 
     def refs(repo, &block)
-      repository = repo_resolver.resolve(repo)
+      repository = resolve_repository(repo)
       d = repository.refs
       d.callback do |refs|
         names = refs.map(&:name)
         block.call(nil, {
-                     :repository_slug => repo,
                      :tags => expand_refs(repository, names, :tags),
                      :heads => expand_refs(repository, names, :heads)
-                   })
+                   }.merge(repository.to_hash))
       end
       d.errback { |err| block.call(err, nil) }
     end
@@ -79,27 +78,44 @@ module Dolt
     private
     def repo_resolver; @repo_resolver; end
 
+    def resolve_repository(repo)
+      ResolvedRepository.new(repo, repo_resolver.resolve(repo))
+    end
+
     def repo_action(repo, ref, path, data, method, *args, &block)
-      repository = repo_resolver.resolve(repo)
+      repository = resolve_repository(repo)
       d = repository.send(method, *args)
       d.callback do |result|
-        block.call(nil, tpl_data(repo, ref, path, { data => result }))
+        block.call(nil, tpl_data(repository, ref, path, { data => result }))
       end
       d.errback { |err| block.call(err, nil) }
     end
 
     def tpl_data(repo, ref, path, locals = {})
-      {
-        :repository_slug => repo,
-        :path => path,
-        :ref => ref
-      }.merge(locals)
+      { :path => path,
+        :ref => ref }.merge(repo.to_hash).merge(locals)
     end
 
     def expand_refs(repository, names, type)
       names.select { |n| n =~ /#{type}/ }.map do |n|
         [n.sub(/^refs\/#{type}\//, ""), repository.rev_parse_oid_sync(n)]
       end
+    end
+  end
+
+  class ResolvedRepository
+    def initialize(slug, repository)
+      @repository = repository
+      @data = { :repository_slug => slug }
+      @data[:repository_meta] = repository.meta if repository.respond_to?(:meta)
+    end
+
+    def to_hash
+      @data
+    end
+
+    def method_missing(method, *args, &block)
+      @repository.send(method, *args, &block)
     end
   end
 end

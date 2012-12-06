@@ -24,14 +24,14 @@ describe Dolt::View::TabWidth do
 
   describe "#format_whitespace" do
     it "limits width of whitespace" do
-      Dolt::View::TabWidth.tab_width = 4
+      def self.tab_width; 4; end
       html = format_whitespace("class File\n\tattr_reader :path\nend")
 
       assert_match(/    attr_reader/, html)
     end
 
     it "uses wide tabs in formatted blobs" do
-      Dolt::View::TabWidth.tab_width = 12
+      def self.tab_width; 12; end
       html = format_text_blob("file.rb", "class File\n\tattr_reader :path\nend")
 
       assert_match(/            attr_reader/, html)

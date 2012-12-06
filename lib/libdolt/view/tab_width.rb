@@ -19,11 +19,8 @@
 module Dolt
   module View
     module TabWidth
-      def self.tab_width; @@tab_width; end
-      def self.tab_width=(tab_width); @@tab_width = tab_width; end
-
       def format_whitespace(text)
-        text.gsub(/\t/, " " * TabWidth.tab_width)
+        text.gsub(/\t/, " " * tab_width)
       end
     end
   end

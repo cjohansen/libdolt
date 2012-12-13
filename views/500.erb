@@ -18,5 +18,10 @@
 #++
 %>
 <h1><%= @title = "An error occurred" %></h1>
-<h2><%= error.respond_to?(:message) ? error.message : error %></h2>
+<h2><%= CGI::escapeElement(error.respond_to?(:message) ? error.message : error).gsub(/</, "&lt;") %></h2>
+<% if error.respond_to?(:backtrace) && !error.backtrace.nil? %>
+  <ul>
+    <%= error.backtrace.map { |l| "<li>#{l}</li>" }.join("") %>
+  </ul>
+<% end %>
 <p><a href="<%= tree_url(repository_slug, ref, "") %>">Go back</a></p>

@@ -97,9 +97,9 @@ describe Dolt::View::Blame do
     it "includes the commit oid" do
       html = blame_annotation_cell({ :committer => @committer, :oid => @oid })
 
-      assert_match /gts-sha/, html
-      assert_match /1234567/, html
-      refute_match /890/, html
+      assert_match /gts-commit-oid/, html
+      assert_match /data-gts-commit-oid="#{@oid}"/, html
+      assert_match />1234567</, html
     end
 
     it "includes the commit date" do

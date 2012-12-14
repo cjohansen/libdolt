@@ -11,7 +11,7 @@
   <% commits.each do |commit| %>
     <div class="gts-commit">
       <p class="gts-log-message">
-        <span class="gts-commit-oid"><%= commit_oid(commit[:oid]) %></span>:
+        <span class="gts-commit-oid" data-gts-commit-oid="<%= commit[:oid] %>"><%= commit_oid(commit[:oid]) %></span>:
         <%= commit[:summary] %>
       </p>
       <p>

@@ -16,4 +16,10 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
+%><%
+tree.each do |entry|
+  entry[:history].each do |e|
+    e[:author][:name].force_encoding("utf-8")
+  end
+end
 %><%= JSON.generate(tree) %>

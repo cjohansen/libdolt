@@ -21,6 +21,7 @@ require "libdolt/view"
 class Blob
   attr_reader :content
   def initialize(content); @content = content; end
+  def text(max_lines, encoding); content; end
 end
 
 describe "blob template" do

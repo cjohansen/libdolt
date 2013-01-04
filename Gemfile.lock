@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    libdolt (0.12.0)
+    libdolt (0.13.0)
       em_pessimistic (~> 0.1)
       em_rugged (~> 0.3)
       eventmachine (~> 1.0)
@@ -25,7 +25,7 @@ GEM
     eventmachine (1.0.0)
     github-markup (0.7.4)
     htmlentities (4.3.1)
-    json (1.7.5)
+    json (1.7.6)
     makeup (0.3.0)
       github-markup (~> 0.7)
       htmlentities (~> 4.3)

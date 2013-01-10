@@ -46,7 +46,7 @@ describe Dolt::Git::Archiver do
 
     it "resolves with existing cached file" do
       File.stubs(:exists?).with("/cache/gts-mainline-master.tar.gz").returns(true)
-      repo = StubRepository.new("gts-mainline")
+      repo = StubRepository.new("gts/mainline")
 
       @archiver.archive(repo, "master", :tar).then do |filename|
         assert_equal "/cache/gts-mainline-master.tar.gz", filename
@@ -56,9 +56,9 @@ describe Dolt::Git::Archiver do
     end
 
     it "generates tarball" do
-      repo = StubRepository.new("gts-mainline")
+      repo = StubRepository.new("gts/mainline")
 
-      cmd = "sh -c 'git --git-dir /repos/gts-mainline.git archive --prefix='gts-mainline/' " +
+      cmd = "sh -c 'git --git-dir /repos/gts/mainline.git archive --prefix='gts-mainline/' " +
         "--format=tar master | gzip -m > /work/gts-mainline-master.tar.gz'"
       d = EM::DefaultDeferrable.new
       EMPessimistic::DeferrableChildProcess.expects(:open).with(cmd).returns(d)
@@ -66,10 +66,32 @@ describe Dolt::Git::Archiver do
       @archiver.archive(repo, "master", :tar)
     end
 
+    it "uses gzip format from string" do
+      repo = StubRepository.new("gts/mainline")
+
+      cmd = "sh -c 'git --git-dir /repos/gts/mainline.git archive --prefix='gts-mainline/' " +
+        "--format=tar master | gzip -m > /work/gts-mainline-master.tar.gz'"
+      d = EM::DefaultDeferrable.new
+      EMPessimistic::DeferrableChildProcess.expects(:open).with(cmd).returns(d)
+
+      @archiver.archive(repo, "master", "tar")
+    end
+
+    it "uses zip format from string" do
+      repo = StubRepository.new("gts/mainline")
+
+      cmd = "sh -c 'git --git-dir /repos/gts/mainline.git archive --prefix='gts-mainline/' " +
+        "--format=zip master > /work/gts-mainline-master.zip'"
+      d = EM::DefaultDeferrable.new
+      EMPessimistic::DeferrableChildProcess.expects(:open).with(cmd).returns(d)
+
+      @archiver.archive(repo, "master", "zip")
+    end
+
     it "moves tarball when successfully generated" do
       FileUtils.expects(:mv).with("/work/gts-mainline-master.tar.gz",
                                   "/cache/gts-mainline-master.tar.gz")
-      repo = StubRepository.new("gts-mainline")
+      repo = StubRepository.new("gts/mainline")
       d = EM::DefaultDeferrable.new
       EMPessimistic::DeferrableChildProcess.expects(:open).returns(d)
       d.succeed("", StubProcessStatus.new(0))
@@ -80,7 +102,7 @@ describe Dolt::Git::Archiver do
     it "does not move tarball when raising error" do
       FileUtils.expects(:mv).with("/work/gts-mainline-master.tar.gz",
                                   "/cache/gts-mainline-master.tar.gz").never
-      repo = StubRepository.new("gts-mainline")
+      repo = StubRepository.new("gts/mainline")
       d = EM::DefaultDeferrable.new
       EMPessimistic::DeferrableChildProcess.expects(:open).returns(d)
       d.fail("", StubProcessStatus.new(1))
@@ -90,7 +112,7 @@ describe Dolt::Git::Archiver do
 
     it "resolves promise with generated filename" do
       FileUtils.stubs(:mv)
-      repo = StubRepository.new("gts-mainline")
+      repo = StubRepository.new("gts/mainline")
       d = EM::DefaultDeferrable.new
       EMPessimistic::DeferrableChildProcess.expects(:open).returns(d)
       d.succeed("", StubProcessStatus.new(0))
@@ -103,7 +125,7 @@ describe Dolt::Git::Archiver do
     end
 
     it "rejects promise when failing to archive" do
-      repo = StubRepository.new("gts-mainline")
+      repo = StubRepository.new("gts/mainline")
       d = EM::DefaultDeferrable.new
       EMPessimistic::DeferrableChildProcess.expects(:open).returns(d)
       d.fail("It done failed", StubProcessStatus.new(1))
@@ -117,7 +139,7 @@ describe Dolt::Git::Archiver do
 
     it "does not spawn multiple identical processes" do
       FileUtils.stubs(:mv)
-      repo = StubRepository.new("gts-mainline")
+      repo = StubRepository.new("gts/mainline")
       d = EM::DefaultDeferrable.new
       EMPessimistic::DeferrableChildProcess.expects(:open).once.returns(d)
       callbacks = 0
@@ -136,7 +158,7 @@ describe Dolt::Git::Archiver do
 
     it "spawns new process when format is different" do
       FileUtils.stubs(:mv)
-      repo = StubRepository.new("gts-mainline")
+      repo = StubRepository.new("gts/mainline")
       d = EM::DefaultDeferrable.new
       EMPessimistic::DeferrableChildProcess.expects(:open).twice.returns(d)
       callbacks = 0

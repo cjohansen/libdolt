@@ -59,7 +59,6 @@ module Dolt
 
       def start_process(repo, oid, format)
         @processing[process_id(repo, oid, format)] = When.defer do |d|
-          puts cmd(repo, oid, format)
           p = EMPessimistic::DeferrableChildProcess.open(cmd(repo, oid, format))
 
           p.callback do |output, status|
@@ -75,10 +74,11 @@ module Dolt
       end
 
       def cmd(repository, oid, format)
+        path_segment = repository.path_segment.gsub(/\//, "-")
         cmd = "sh -c 'git --git-dir #{repository.full_repository_path} archive "
-        cmd += "--prefix='#{u(repository.path_segment)}/' --format="
+        cmd += "--prefix='#{u(path_segment)}/' --format="
         wpath = u(work_path(repository, oid, format))
-        cmd + (format == :zip ? "zip #{u(oid)} > #{wpath}" : "tar #{u(oid)} | gzip -m > #{wpath}") + "'"
+        cmd + (format.to_s == "zip" ? "zip #{u(oid)} > #{wpath}" : "tar #{u(oid)} | gzip -m > #{wpath}") + "'"
       end
 
       def cache_path(repository, oid, format)
@@ -90,11 +90,12 @@ module Dolt
       end
 
       def basename(repository, oid, format)
-        "#{repository.path_segment}-#{oid}.#{ext(format)}"
+        path_segment = repository.path_segment.gsub(/\//, "-")
+        "#{path_segment}-#{oid}.#{ext(format)}"
       end
 
       def ext(format)
-        format == :zip ? "zip" : "tar.gz"
+        format.to_s == "zip" ? "zip" : "tar.gz"
       end
 
       # Unquote a string by stripping off any single or double quotes

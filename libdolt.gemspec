@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake", "~> 0.9"
   s.add_development_dependency "redcarpet", "2.2.0"
   s.add_development_dependency "tiltout", "~>1.4"
+  s.add_development_dependency "mocha"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test}/*`.split("\n")

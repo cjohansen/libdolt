@@ -30,8 +30,11 @@ GEM
       github-markup (~> 0.7)
       htmlentities (~> 4.3)
       pygments.rb (~> 0.2)
+    metaclass (0.0.1)
     mime-types (1.19)
     minitest (2.12.1)
+    mocha (0.13.1)
+      metaclass (~> 0.0.1)
     posix-spawn (0.3.6)
     pygments.rb (0.3.2)
       posix-spawn (~> 0.3.6)
@@ -53,6 +56,7 @@ DEPENDENCIES
   em-minitest-spec (~> 1.1)
   libdolt!
   minitest (~> 2.0)
+  mocha
   rake (~> 0.9)
   redcarpet (= 2.2.0)
   tiltout (~> 1.4)

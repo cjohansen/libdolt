@@ -24,8 +24,9 @@ class Time; def to_json(*args); "\"#{iso8601}\""; end; end
 
 module Dolt
   class RepoActions
-    def initialize(repo_resolver)
+    def initialize(repo_resolver, archiver = nil)
       @repo_resolver = repo_resolver
+      @archiver = archiver
     end
 
     def blob(repo, ref, path, &block)
@@ -69,6 +70,13 @@ module Dolt
 
     def tree_history(repo, ref, path, count, &block)
       repo_action(repo, ref, path, :tree, :tree_history, ref, path, count, &block)
+    end
+
+    def archive(repo, ref, format, &block)
+      repository = resolve_repository(repo)
+      d = @archiver.archive(repository, ref, format)
+      d.callback { |filename| block.call(nil, filename) }
+      d.errback { |err| block.call(err, nil) }
     end
 
     def repositories

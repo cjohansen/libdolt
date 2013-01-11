@@ -82,12 +82,12 @@ module Dolt
       repo_resolver.all
     end
 
-    private
-    def repo_resolver; @repo_resolver; end
-
     def resolve_repository(repo)
       ResolvedRepository.new(repo, repo_resolver.resolve(repo))
     end
+
+    private
+    def repo_resolver; @repo_resolver; end
 
     def repo_action(repo, ref, path, data, method, *args, &block)
       repository = resolve_repository(repo)
@@ -107,6 +107,12 @@ module Dolt
       names.select { |n| n =~ /#{type}/ }.map do |n|
         [n.sub(/^refs\/#{type}\//, ""), repository.rev_parse_oid_sync(n)]
       end
+    end
+
+    def u(str)
+      # Temporarily swap the + out with a magic byte, so
+      # filenames/branches with +'s won't get unescaped to a space
+      CGI.unescape(str.gsub("+", "\001")).gsub("\001", '+')
     end
   end
 

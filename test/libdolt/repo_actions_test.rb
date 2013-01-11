@@ -19,6 +19,7 @@ require "test_helper"
 require "libdolt/repo_actions"
 require "when"
 require "ostruct"
+require "mocha/setup"
 
 class Repository
   attr_reader :name
@@ -30,7 +31,7 @@ class Repository
   def tree(ref, path); stub; end
   def tree_entry(ref, path); stub; end
   def rev_parse(rev); stub; end
-  def rev_parse_oid_sync(ref); @refs[ref] || nil; end
+  def rev_parse_oid_sync(ref); @refs[ref] || nik; end
   def blame(ref, path); stub; end
   def log(ref, path, limit); stub; end
   def refs; stub; end
@@ -305,6 +306,14 @@ describe Dolt::RepoActions do
       resolver.resolved.last.resolve_promise("Blob")
 
       assert_equal "Meta data is cool", data[:repository_meta]
+    end
+  end
+
+  describe "#rev_parse_oid" do
+    it "resolves ref oid" do
+      oid = "a" * 40
+      Repository.any_instance.stubs(:rev_parse_oid_sync).returns(oid)
+      assert_equal oid, @actions.rev_parse_oid("gitorious", "master")
     end
   end
 end

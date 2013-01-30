@@ -91,6 +91,10 @@ describe Dolt::Git::Repository do
   end
 
   describe "#blame" do
+    before do
+      @dcp = EMPessimistic::DeferrableChildProcess
+    end
+
     it "returns deferrable" do
       deferrable = @repository.blame("master", "Gemfile")
       assert deferrable.respond_to?(:callback)
@@ -106,11 +110,15 @@ describe Dolt::Git::Repository do
     end
 
     it "separates tree-like and path" do
-      def @repository.git(cmd); @cmd = cmd; end
-      def @repository.cmd; @cmd; end
-      @repository.blame("master", "Gemfile").callback
+      cmd = "git --git-dir #{@repository.path} blame -l -t -p master -- Gemfile"
+      @dcp.expects(:open).with(cmd).returns(When.defer)
+      @repository.blame("master", "Gemfile")
+    end
 
-      assert_equal "blame -l -t -p master -- Gemfile", @repository.cmd
+    it "does not allow injecting evil commands" do
+      cmd = "git --git-dir #{@repository.path} blame -l -t -p master -- Gemfile\\; rm -fr /tmp"
+      @dcp.expects(:open).with(cmd).returns(When.defer)
+      @repository.blame("master", "Gemfile; rm -fr /tmp")
     end
   end
 

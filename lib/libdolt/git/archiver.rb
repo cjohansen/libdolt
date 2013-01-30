@@ -19,6 +19,7 @@ require "when"
 require "eventmachine"
 require "em_pessimistic"
 require "fileutils"
+require "shellwords"
 
 module Dolt
   module Git
@@ -90,17 +91,16 @@ module Dolt
       end
 
       def basename(repository, oid, format)
-        path_segment = repository.path_segment.gsub(/\//, "-")
-        "#{path_segment}-#{oid}.#{ext(format)}"
+        path_segment = "#{repository.path_segment}-#{oid}".gsub(/\//, "-")
+        "#{path_segment}.#{ext(format)}"
       end
 
       def ext(format)
         format.to_s == "zip" ? "zip" : "tar.gz"
       end
 
-      # Unquote a string by stripping off any single or double quotes
       def u(string)
-        string.gsub("'", '').gsub('"', '')
+        Shellwords.escape(string)
       end
     end
   end

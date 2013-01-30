@@ -66,6 +66,17 @@ describe Dolt::Git::Archiver do
       @archiver.archive(repo, "master", :tar)
     end
 
+    it "does not allow arbitrary commands" do
+      repo = StubRepository.new("gts/mainline")
+
+      cmd = "sh -c 'git --git-dir /repos/gts/mainline.git archive --prefix='gts-mainline/' " +
+        "--format=tar master\\;\\ rm\\ -fr\\ / | gzip -m > /work/gts-mainline-master\\;\\ rm\\ -fr\\ -.tar.gz'"
+      d = EM::DefaultDeferrable.new
+      EMPessimistic::DeferrableChildProcess.expects(:open).with(cmd).returns(d)
+
+      @archiver.archive(repo, "master; rm -fr /", :tar)
+    end
+
     it "uses gzip format from string" do
       repo = StubRepository.new("gts/mainline")
 

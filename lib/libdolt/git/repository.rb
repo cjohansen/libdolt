@@ -22,6 +22,7 @@ require "libdolt/git/commit"
 require "libdolt/git/submodule"
 require "libdolt/git/tree"
 require "when"
+require "shellwords"
 
 module Dolt
   module Git
@@ -145,8 +146,7 @@ module Dolt
 
       def deferred_method(cmd, &block)
         d = When.defer
-        cmd = git(cmd)
-        p = EMPessimistic::DeferrableChildProcess.open(cmd)
+        p = EMPessimistic::DeferrableChildProcess.open(git(cmd))
 
         p.callback do |output, status|
           d.resolve(block.call(output, status))
@@ -160,7 +160,7 @@ module Dolt
       end
 
       def git(cmd)
-        "git --git-dir #{path} #{cmd}"
+        "git --git-dir #{path} #{Shellwords.join(cmd.split(' '))}"
       end
     end
   end

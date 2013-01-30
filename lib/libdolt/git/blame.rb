@@ -19,6 +19,8 @@ require "tzinfo"
 
 module Dolt
   module Git
+    class InvalidBlameFormat < Exception; end
+
     class Blame
       attr_reader :chunks
 
@@ -53,6 +55,8 @@ module Dolt
           end
 
           chunks
+        rescue Exception => error
+          raise InvalidBlameFormat.new("Failed parsing Procelain: #{error.message}")
         end
 
         def is_header?(line)

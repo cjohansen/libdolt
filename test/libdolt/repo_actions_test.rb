@@ -1,6 +1,6 @@
 # encoding: utf-8
 #--
-#   Copyright (C) 2012 Gitorious AS
+#   Copyright (C) 2012-2013 Gitorious AS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,6 @@
 #++
 require "test_helper"
 require "libdolt/repo_actions"
-require "when"
 require "ostruct"
 require "mocha/setup"
 
@@ -25,30 +24,23 @@ class Repository
   attr_reader :name
   def initialize(name)
     @name = name
-    @refs = {}
   end
 
-  def tree(ref, path); stub; end
-  def tree_entry(ref, path); stub; end
-  def rev_parse(rev); stub; end
-  def rev_parse_oid_sync(ref); @refs[ref] || nik; end
-  def blame(ref, path); stub; end
-  def log(ref, path, limit); stub; end
-  def refs; stub; end
-  def tree_history(ref, path, count); stub; end
+  def tree(ref, path); end
+  def tree_entry(ref, path); end
+  def rev_parse(rev); end
+  def rev_parse_oid(ref); self.class.refs[ref] || nil; end
+  def blame(ref, path); end
+  def log(ref, path, limit); end
+  def refs; end
+  def tree_history(ref, path, count); end
 
-  def resolve_promise(blob)
-    @deferred.resolve(blob)
+  def self.stub_ref(name, ref)
+    self.refs[name] = ref
   end
 
-  def stub_ref(name, ref)
-    @refs[name] = ref
-  end
-
-  private
-  def stub
-    @deferred = When.defer
-    @deferred.promise
+  def self.refs
+    @refs ||= {}
   end
 end
 
@@ -79,6 +71,9 @@ describe Dolt::RepoActions do
   before do
     @resolver = Resolver.new
     @actions = Dolt::RepoActions.new(@resolver)
+    @blob = FakeBlob.new
+    @tree = { :type => :tree }
+    @blame = { :type => :blame }
   end
 
   describe "#blob" do
@@ -88,20 +83,16 @@ describe Dolt::RepoActions do
       assert_equal ["gitorious"], @resolver.resolved.map(&:name)
     end
 
-    it "yields path, blob, repo, ref and base_tree_url to block" do
-      data = nil
-      @actions.blob("gitorious", "babd120", "app") do |err, d|
-        data = d
-      end
-
-      @resolver.resolved.last.resolve_promise("Blob")
+    it "returns path, blob, repo, ref and base_tree_url" do
+      Repository.any_instance.stubs(:rev_parse).returns(@blob)
+      data = @actions.blob("gitorious", "babd120", "app")
 
       assert_equal({
-                     :blob => "Blob",
-                     :repository_slug => "gitorious",
-                     :ref =>  "babd120",
-                     :path => "app"
-                   }, data)
+          :blob => @blob,
+          :repository_slug => "gitorious",
+          :ref =>  "babd120",
+          :path => "app"
+        }, data)
     end
   end
 
@@ -112,57 +103,46 @@ describe Dolt::RepoActions do
       assert_equal ["gitorious"], @resolver.resolved.map(&:name)
     end
 
-    it "yields tree, repo and ref to block" do
-      data = nil
-      @actions.tree("gitorious", "babd120", "app") do |err, d|
-        data = d
-      end
-
+    it "returns tree, repo and ref" do
+      Repository.any_instance.stubs(:tree).returns(@tree)
+      data = @actions.tree("gitorious", "babd120", "app")
       repo = @resolver.resolved.last
-      repo.resolve_promise "Tree"
 
-      expected = {
-        :tree => "Tree",
-        :repository_slug => "gitorious",
-        :ref =>  "babd120",
-        :path => "app"
-      }
-      assert_equal expected, data
+      assert_equal({
+          :tree => @tree,
+          :repository_slug => "gitorious",
+          :ref =>  "babd120",
+          :path => "app"
+        }, data)
     end
   end
 
   describe "#tree_entry" do
-    it "yields tree, repo and ref to block" do
-      data = nil
-      @actions.tree_entry("gitorious", "babd120", "") { |err, d| data = d }
+    it "returns tree, repo and ref" do
+      Repository.any_instance.stubs(:tree_entry).returns(@tree)
+      data = @actions.tree_entry("gitorious", "babd120", "")
       repo = @resolver.resolved.last
-      repo.resolve_promise "Tree"
 
-      expected = {
-        :tree => "Tree",
-        :repository_slug => "gitorious",
-        :ref =>  "babd120",
-        :path => "",
-        :type => :tree
-      }
-      assert_equal expected, data
+      assert_equal({
+          :tree => @tree,
+          :repository_slug => "gitorious",
+          :ref =>  "babd120",
+          :path => "",
+          :type => :tree
+        }, data)
     end
 
-    it "yields tree, repo and ref to block" do
-      data = nil
-      @actions.tree_entry("gitorious", "babd120", "Gemfile") { |err, d| data = d }
-      repo = @resolver.resolved.last
-      blob = FakeBlob.new
-      repo.resolve_promise(blob)
+    it "returns blob, repo and ref" do
+      Repository.any_instance.stubs(:tree_entry).returns(@blob)
+      data = @actions.tree_entry("gitorious", "babd120", "Gemfile")
 
-      expected = {
-        :blob => blob,
-        :repository_slug => "gitorious",
-        :ref =>  "babd120",
-        :path => "Gemfile",
-        :type => :blob
-      }
-      assert_equal expected, data
+      assert_equal({
+          :blob => @blob,
+          :repository_slug => "gitorious",
+          :ref =>  "babd120",
+          :path => "Gemfile",
+          :type => :blob
+        }, data)
     end
   end
 
@@ -173,22 +153,16 @@ describe Dolt::RepoActions do
       assert_equal ["gitorious"], @resolver.resolved.map(&:name)
     end
 
-    it "yields blame, repo and ref to block" do
-      data = nil
-      @actions.blame("gitorious", "babd120", "app") do |err, d|
-        data = d
-      end
+    it "returns blame, repo and ref" do
+      Repository.any_instance.stubs(:blame).returns(@blame)
+      data = @actions.blame("gitorious", "babd120", "app")
 
-      repo = @resolver.resolved.last
-      repo.resolve_promise "Blame"
-
-      expected = {
-        :blame => "Blame",
-        :repository_slug => "gitorious",
-        :ref =>  "babd120",
-        :path => "app"
-      }
-      assert_equal expected, data
+      assert_equal({
+          :blame => @blame,
+          :repository_slug => "gitorious",
+          :ref =>  "babd120",
+          :path => "app"
+        }, data)
     end
   end
 
@@ -199,22 +173,16 @@ describe Dolt::RepoActions do
       assert_equal ["gitorious"], @resolver.resolved.map(&:name)
     end
 
-    it "yields commits, repo and ref to block" do
-      data = nil
-      @actions.history("gitorious", "babd120", "app", 2) do |err, d|
-        data = d
-      end
+    it "returns commits, repo and ref" do
+      Repository.any_instance.stubs(:log).returns([])
+      data = @actions.history("gitorious", "babd120", "app", 2)
 
-      repo = @resolver.resolved.last
-      repo.resolve_promise "History"
-
-      expected = {
-        :commits => "History",
-        :repository_slug => "gitorious",
-        :ref =>  "babd120",
-        :path => "app"
-      }
-      assert_equal expected, data
+      assert_equal({
+          :commits => [],
+          :repository_slug => "gitorious",
+          :ref =>  "babd120",
+          :path => "app"
+        }, data)
     end
   end
 
@@ -228,23 +196,20 @@ describe Dolt::RepoActions do
                "refs/heads/master"].map { |n| OpenStruct.new(:name => n) }
     end
 
-    it "yields repositories, tags and heads" do
-      data = nil
-      @actions.refs("gitorious") { |err, d| data = d }
+    it "returns repositories, tags and heads" do
+      Repository.any_instance.stubs(:refs).returns(@refs)
+      Repository.stub_ref("refs/tags/v0.2.0", "a" * 40)
+      Repository.stub_ref("refs/tags/v0.2.1", "b" * 40)
+      Repository.stub_ref("refs/heads/libgit2", "c" * 40)
+      Repository.stub_ref("refs/heads/master", "d" * 40)
 
-      repo = @resolver.resolved.last
-      repo.stub_ref("refs/tags/v0.2.0", "a" * 40)
-      repo.stub_ref("refs/tags/v0.2.1", "b" * 40)
-      repo.stub_ref("refs/heads/libgit2", "c" * 40)
-      repo.stub_ref("refs/heads/master", "d" * 40)
-      repo.resolve_promise(@refs)
+      data = @actions.refs("gitorious")
 
-      expected = {
-        :repository_slug => "gitorious",
-        :heads => [["libgit2", "c" * 40], ["master", "d" * 40]],
-        :tags => [["v0.2.1", "b" * 40], ["v0.2.0", "a" * 40]]
-      }
-      assert_equal expected, data
+      assert_equal({
+          :repository_slug => "gitorious",
+          :heads => [["libgit2", "c" * 40], ["master", "d" * 40]],
+          :tags => [["v0.2.1", "b" * 40], ["v0.2.0", "a" * 40]]
+        }, data)
     end
   end
 
@@ -259,7 +224,7 @@ describe Dolt::RepoActions do
             :oid => "906d67b4f3e5de7364ba9b57d174d8998d53ced6",
             :author => { :name => "Christian Johansen",
                          :email => "christian@cjohansen.no" },
-            :summary => "Working Moron server for viewing blobs",
+            :summary => "Working Dolt server for viewing blobs",
             :date => Time.parse("Mon Sep 10 15:07:39 +0200 2012"),
             :message => ""
           }]
@@ -279,31 +244,24 @@ describe Dolt::RepoActions do
         }]
     end
 
-    it "yields repository, path, ref and history" do
-      data = nil
-      @actions.tree_history("gitorious", "master", "", 1) { |err, d| data = d }
+    it "returns repository, path, ref and history" do
+      Repository.any_instance.stubs(:tree_history).returns(@tree)
+      data = @actions.tree_history("gitorious", "master", "", 1)
 
-      repo = @resolver.resolved.last
-      repo.resolve_promise(@tree)
-
-      expected = {
-        :repository_slug => "gitorious",
-        :ref => "master",
-        :path => "",
-        :tree => @tree
-      }
-      assert_equal expected, data
+      assert_equal({
+          :repository_slug => "gitorious",
+          :ref => "master",
+          :path => "",
+          :tree => @tree
+        }, data)
     end
   end
 
   describe "repository meta data" do
-    it "is yielded with other data to block" do
+    it "is returned with other data" do
       resolver = MetaResolver.new
       actions = Dolt::RepoActions.new(resolver)
-      data = nil
-      actions.blob("gitorious", "babd120", "app") { |err, d| data = d }
-
-      resolver.resolved.last.resolve_promise("Blob")
+      data = actions.blob("gitorious", "babd120", "app")
 
       assert_equal "Meta data is cool", data[:repository_meta]
     end
@@ -312,8 +270,8 @@ describe Dolt::RepoActions do
   describe "#rev_parse_oid" do
     it "resolves ref oid" do
       oid = "a" * 40
-      Repository.any_instance.stubs(:rev_parse_oid_sync).returns(oid)
+      Repository.any_instance.stubs(:rev_parse_oid).returns(oid)
       assert_equal oid, @actions.rev_parse_oid("gitorious", "master")
     end
-  end
+ end
 end

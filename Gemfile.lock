@@ -2,36 +2,25 @@ PATH
   remote: .
   specs:
     libdolt (0.15.0)
-      em_pessimistic (~> 0.1)
-      em_rugged (~> 0.3)
-      eventmachine (~> 1.0)
       htmlentities (~> 4.3)
       json (~> 1.7)
       makeup (~> 0.2)
       mime-types (~> 1.19)
+      rugged (= 0.17.0.b6)
       tzinfo (~> 0.3)
-      when (~> 0)
 
 GEM
   remote: http://rubygems.org/
   specs:
-    em-minitest-spec (1.1.1)
-      eventmachine
-    em_pessimistic (0.1.2)
-      eventmachine (~> 1.0)
-    em_rugged (0.3.0)
-      eventmachine (~> 1.0)
-      rugged (= 0.17.0.b6)
-    eventmachine (1.0.0)
     github-markup (0.7.5)
     htmlentities (4.3.1)
-    json (1.7.6)
+    json (1.7.7)
     makeup (0.3.0)
       github-markup (~> 0.7)
       htmlentities (~> 4.3)
       pygments.rb (~> 0.2)
     metaclass (0.0.1)
-    mime-types (1.19)
+    mime-types (1.21)
     minitest (2.12.1)
     mocha (0.13.1)
       metaclass (~> 0.0.1)
@@ -46,14 +35,12 @@ GEM
     tiltout (1.4.0)
       tilt (~> 1.3)
     tzinfo (0.3.35)
-    when (0.1.0)
     yajl-ruby (1.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  em-minitest-spec (~> 1.1)
   libdolt!
   minitest (~> 2.0)
   mocha

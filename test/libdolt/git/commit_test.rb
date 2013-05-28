@@ -1,6 +1,6 @@
 # encoding: utf-8
 #--
-#   Copyright (C) 2012 Gitorious AS
+#   Copyright (C) 2012-2013 Gitorious AS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -19,8 +19,6 @@ require "test_helper"
 require "libdolt/git/commit"
 
 describe Dolt::Git::Commit do
-  include EM::MiniTest::Spec
-
   describe "parse" do
     before do
       @log = <<-GIT

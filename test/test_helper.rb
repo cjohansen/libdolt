@@ -17,10 +17,9 @@
 #++
 require "bundler/setup"
 require "minitest/autorun"
-require "em/minitest/spec"
-require "eventmachine"
 require "libdolt/view"
 require "tiltout"
+require "stringio"
 
 Bundler.require(:default, :test)
 
@@ -46,6 +45,27 @@ module Dolt
                                   Dolt::View::Gravatar,
                                   Dolt::View::Breadcrumb])
       renderer
+    end
+  end
+
+  class FakeProcess
+    attr_reader :stdin, :stdout, :stderr
+
+    def initialize(status, stdin = nil, stdout = nil, stderr = nil)
+      @status = status
+      @stdin = stream(stdin)
+      @stdout = stream(stdout)
+      @stderr = stream(stderr)
+    end
+
+    def success?; @status == 0; end
+    def exit_code; @status; end
+    def exception; Exception.new; end
+
+    private
+    def stream(ios)
+      return ios if !ios.nil? && !ios.is_a?(String)
+      StringIO.new(ios || "")
     end
   end
 end

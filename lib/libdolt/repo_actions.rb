@@ -28,50 +28,43 @@ module Dolt
       @archiver = archiver
     end
 
-    def blob(repo, ref, path, &block)
-      repo_action(repo, ref, path, :blob, :rev_parse, "#{ref}:#{path}", &block)
+    def blob(repo, ref, path)
+      repo_action(repo, ref, path, :blob, :rev_parse, "#{ref}:#{path}")
     end
 
-    def tree(repo, ref, path, &block)
-      repo_action(repo, ref, path, :tree, :tree, ref, path, &block)
+    def tree(repo, ref, path)
+      repo_action(repo, ref, path, :tree, :tree, ref, path)
     end
 
-    def tree_entry(repo, ref, path, &block)
+    def tree_entry(repo, ref, path)
       repository = resolve_repository(repo)
-      d = repository.tree_entry(ref, path)
-      d.callback do |result|
-        key = result.class.to_s.match(/Blob/) ? :blob : :tree
-        block.call(nil, tpl_data(repository, ref, path, { key => result, :type => key }))
-      end
-      d.errback { |err| block.call(err, nil) }
+      result = repository.tree_entry(ref, path)
+      key = result.class.to_s.match(/Blob/) ? :blob : :tree
+      tpl_data(repository, ref, path, { key => result, :type => key })
     end
 
-    def blame(repo, ref, path, &block)
-      repo_action(repo, ref, path, :blame, :blame, ref, path, &block)
+    def blame(repo, ref, path)
+      repo_action(repo, ref, path, :blame, :blame, ref, path)
     end
 
-    def history(repo, ref, path, count, &block)
-      repo_action(repo, ref, path, :commits, :log, ref, path, count, &block)
+    def history(repo, ref, path, count)
+      repo_action(repo, ref, path, :commits, :log, ref, path, count)
     end
 
-    def refs(repo, &block)
+    def refs(repo)
       repository = resolve_repository(repo)
-      d = repository.refs
-      d.callback do |refs|
-        names = refs.map(&:name)
-        block.call(nil, {
-                     :tags => expand_refs(repository, names, :tags),
-                     :heads => expand_refs(repository, names, :heads)
-                   }.merge(repository.to_hash))
-      end
-      d.errback { |err| block.call(err, nil) }
+      names = repository.refs.map(&:name)
+      {
+        :tags => expand_refs(repository, names, :tags),
+        :heads => expand_refs(repository, names, :heads)
+      }.merge(repository.to_hash)
     end
 
-    def tree_history(repo, ref, path, count, &block)
-      repo_action(repo, ref, path, :tree, :tree_history, ref, path, count, &block)
+    def tree_history(repo, ref, path, count)
+      repo_action(repo, ref, path, :tree, :tree_history, ref, path, count)
     end
 
-    def archive(repo, ref, format, &block)
+    def archive(repo, ref, format)
       repository = resolve_repository(repo)
       d = @archiver.archive(repository, ref, format)
       d.callback { |filename| block.call(nil, filename) }
@@ -87,19 +80,18 @@ module Dolt
     end
 
     def rev_parse_oid(repo, ref)
-      resolve_repository(repo).rev_parse_oid_sync(ref)
+      resolve_repository(repo).rev_parse_oid(ref)
     end
 
     private
     def repo_resolver; @repo_resolver; end
 
-    def repo_action(repo, ref, path, data, method, *args, &block)
+    def repo_action(repo, ref, path, data, method, *args)
       repository = resolve_repository(repo)
-      d = repository.send(method, *args)
-      d.callback do |result|
-        block.call(nil, tpl_data(repository, ref, path, { data => result }))
-      end
-      d.errback { |err| block.call(err, nil) }
+
+      tpl_data(repository, ref, path, {
+          data => repository.send(method, *args)
+        })
     end
 
     def tpl_data(repo, ref, path, locals = {})
@@ -109,7 +101,7 @@ module Dolt
 
     def expand_refs(repository, names, type)
       names.select { |n| n =~ /#{type}/ }.map do |n|
-        [n.sub(/^refs\/#{type}\//, ""), repository.rev_parse_oid_sync(n)]
+        [n.sub(/^refs\/#{type}\//, ""), repository.rev_parse_oid(n)]
       end
     end
   end

@@ -1,6 +1,6 @@
 # encoding: utf-8
 #--
-#   Copyright (C) 2012-2013 Gitorious AS
+#   Copyright (C) 2013 Gitorious AS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -17,5 +17,28 @@
 #++
 
 module Dolt
-  VERSION = "0.16.0"
+  module Git
+    class Process
+      attr_reader :stdin, :stdout, :stderr
+
+      def initialize(stdin, stdout, stderr, process_status)
+        @stdin = stdin
+        @stdout = stdout
+        @stderr = stderr
+        @process_status = process_status
+      end
+
+      def success?
+        @process_status.success?
+      end
+
+      def exit_code
+        @process_status.exitstatus
+      end
+
+      def exception
+        Exception.new(stderr.read)
+      end
+    end
+  end
 end

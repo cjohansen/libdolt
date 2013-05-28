@@ -29,30 +29,18 @@ class StubRepository
   end
 end
 
-class StubProcessStatus
-  attr_reader :exitstatus
-  def initialize(code)
-    @exitstatus = code
-  end
-end
-
 describe Dolt::Git::Archiver do
-  include EM::MiniTest::Spec
-
   describe "archive" do
     before do
       @archiver = Dolt::Git::Archiver.new("/work", "/cache")
     end
 
-    it "resolves with existing cached file" do
+    it "returns existing cached file" do
       File.stubs(:exists?).with("/cache/gts-mainline-master.tar.gz").returns(true)
       repo = StubRepository.new("gts/mainline")
 
-      @archiver.archive(repo, "master", :tar).then do |filename|
-        assert_equal "/cache/gts-mainline-master.tar.gz", filename
-        done!
-      end
-      wait!
+      filename = @archiver.archive(repo, "master", :tar)
+      assert_equal "/cache/gts-mainline-master.tar.gz", filename
     end
 
     it "generates tarball" do
@@ -60,8 +48,8 @@ describe Dolt::Git::Archiver do
 
       cmd = "sh -c 'git --git-dir /repos/gts/mainline.git archive --prefix='gts-mainline/' " +
         "--format=tar master | gzip -m > /work/gts-mainline-master.tar.gz'"
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).with(cmd).returns(d)
+      Dolt::Git.expects(:shell).with(cmd).returns(Dolt::FakeProcess.new(0))
+      FileUtils.stubs(:mv)
 
       @archiver.archive(repo, "master", :tar)
     end
@@ -71,8 +59,8 @@ describe Dolt::Git::Archiver do
 
       cmd = "sh -c 'git --git-dir /repos/gts/mainline.git archive --prefix='gts-mainline/' " +
         "--format=tar master\\;\\ rm\\ -fr\\ / | gzip -m > /work/gts-mainline-master\\;\\ rm\\ -fr\\ -.tar.gz'"
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).with(cmd).returns(d)
+      Dolt::Git.expects(:shell).with(cmd).returns(Dolt::FakeProcess.new(0))
+      FileUtils.stubs(:mv)
 
       @archiver.archive(repo, "master; rm -fr /", :tar)
     end
@@ -82,8 +70,8 @@ describe Dolt::Git::Archiver do
 
       cmd = "sh -c 'git --git-dir /repos/gts/mainline.git archive --prefix='gts-mainline/' " +
         "--format=tar master | gzip -m > /work/gts-mainline-master.tar.gz'"
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).with(cmd).returns(d)
+      Dolt::Git.expects(:shell).with(cmd).returns(Dolt::FakeProcess.new(0))
+      FileUtils.stubs(:mv)
 
       @archiver.archive(repo, "master", "tar")
     end
@@ -93,8 +81,8 @@ describe Dolt::Git::Archiver do
 
       cmd = "sh -c 'git --git-dir /repos/gts/mainline.git archive --prefix='gts-mainline/' " +
         "--format=zip master > /work/gts-mainline-master.zip'"
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).with(cmd).returns(d)
+      Dolt::Git.expects(:shell).with(cmd).returns(Dolt::FakeProcess.new(0))
+      FileUtils.stubs(:mv)
 
       @archiver.archive(repo, "master", "zip")
     end
@@ -103,9 +91,7 @@ describe Dolt::Git::Archiver do
       FileUtils.expects(:mv).with("/work/gts-mainline-master.tar.gz",
                                   "/cache/gts-mainline-master.tar.gz")
       repo = StubRepository.new("gts/mainline")
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).returns(d)
-      d.succeed("", StubProcessStatus.new(0))
+      Dolt::Git.stubs(:open).returns(Dolt::FakeProcess.new(0))
 
       @archiver.archive(repo, "master", :tar)
     end
@@ -114,80 +100,20 @@ describe Dolt::Git::Archiver do
       FileUtils.expects(:mv).with("/work/gts-mainline-master.tar.gz",
                                   "/cache/gts-mainline-master.tar.gz").never
       repo = StubRepository.new("gts/mainline")
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).returns(d)
-      d.fail("", StubProcessStatus.new(1))
+      Dolt::Git.expects(:shell).returns(Dolt::FakeProcess.new(1))
 
-      @archiver.archive(repo, "master", :tar)
+      assert_raises Exception do
+        @archiver.archive(repo, "master", :tar)
+      end
     end
 
-    it "resolves promise with generated filename" do
+    it "returns generated filename" do
       FileUtils.stubs(:mv)
+      Dolt::Git.stubs(:open).returns(Dolt::FakeProcess.new(0))
       repo = StubRepository.new("gts/mainline")
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).returns(d)
-      d.succeed("", StubProcessStatus.new(0))
 
-      @archiver.archive(repo, "master", :tar).then do |filename|
-        assert_equal "/cache/gts-mainline-master.tar.gz", filename
-        done!
-      end
-      wait!
-    end
-
-    it "rejects promise when failing to archive" do
-      repo = StubRepository.new("gts/mainline")
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).returns(d)
-      d.fail("It done failed", StubProcessStatus.new(1))
-
-      @archiver.archive(repo, "master", :tar).errback do |err|
-        assert_match "It done failed", err.message
-        done!
-      end
-      wait!
-    end
-
-    it "does not spawn multiple identical processes" do
-      FileUtils.stubs(:mv)
-      repo = StubRepository.new("gts/mainline")
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).once.returns(d)
-      callbacks = 0
-      blk = lambda do |filename|
-        assert_equal "/cache/gts-mainline-master.tar.gz", filename
-        callbacks += 1
-        done! if callbacks == 2
-      end
-
-      @archiver.archive(repo, "master", :tar).then(&blk)
-      @archiver.archive(repo, "master", :tar).then(&blk)
-
-      wait!
-      d.succeed("", StubProcessStatus.new(0))
-    end
-
-    it "spawns new process when format is different" do
-      FileUtils.stubs(:mv)
-      repo = StubRepository.new("gts/mainline")
-      d = EM::DefaultDeferrable.new
-      EMPessimistic::DeferrableChildProcess.expects(:open).twice.returns(d)
-      callbacks = 0
-
-      @archiver.archive(repo, "master", :tar).then do |filename|
-        assert_equal "/cache/gts-mainline-master.tar.gz", filename
-        callbacks += 1
-        done! if callbacks == 2
-      end
-
-      @archiver.archive(repo, "master", :zip).then do |filename|
-        assert_equal "/cache/gts-mainline-master.zip", filename
-        callbacks += 1
-        done! if callbacks == 2
-      end
-
-      wait!
-      d.succeed("", StubProcessStatus.new(0))
+      filename = @archiver.archive(repo, "master", :tar)
+      assert_equal "/cache/gts-mainline-master.tar.gz", filename
     end
   end
 end

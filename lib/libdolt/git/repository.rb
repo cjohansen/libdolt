@@ -1,6 +1,6 @@
 # encoding: utf-8
 #--
-#   Copyright (C) 2012 Gitorious AS
+#   Copyright (C) 2012-2013 Gitorious AS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -15,54 +15,45 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
-require "em_rugged/repository"
-require "em_pessimistic/deferrable_child_process"
+require "rugged"
+require "libdolt/git"
 require "libdolt/git/blame"
 require "libdolt/git/commit"
 require "libdolt/git/submodule"
 require "libdolt/git/tree"
-require "when"
-require "shellwords"
 
 module Dolt
   module Git
-    class Repository < EMRugged::Repository
-      def submodules(ref)
-        d = When.defer
-        gm = rev_parse("#{ref}:.gitmodules")
-        gm.callback do |config|
-          d.resolve(Dolt::Git::Submodule.parse_config(config.content))
-        end
-        # Fails if .gitmodules cannot be found, which means no submodules
-        gm.errback { |err| d.resolve([]) }
-        d
+    class Repository
+      def initialize(root)
+        @repo = Rugged::Repository.new(root)
       end
 
-      def tree_entry(ref, path)
-        When.defer do |d|
-          rp = rev_parse("#{ref}:#{path}")
-          rp.callback { |object| annotate_tree(d, ref, path, object) }
-          rp.errback { |err| d.reject(err) }
-        end
+      def bare?; @repo.bare?; end
+      def path; @repo.path; end
+      def rev_parse(*args); @repo.rev_parse(*args); end
+
+      def submodules(ref)
+        config = rev_parse("#{ref}:.gitmodules")
+        Dolt::Git::Submodule.parse_config(config.content)
+      rescue Rugged::IndexerError => err
+        # Raised if .gitmodules cannot be found, which means no submodules
+        []
       end
 
       def tree(ref, path)
-        When.defer do |d|
-          rp = rev_parse("#{ref}:#{path}")
-          rp.callback do |object|
-            if !object.is_a?(Rugged::Tree)
-              next d.reject(StandardError.new("Not a tree"))
-            end
-            annotate_tree(d, ref, path, object)
-          end
-          rp.errback { |err| d.reject(err) }
-        end
+        object = rev_parse("#{ref}:#{path}")
+        raise StandardError.new("Not a tree") if !object.is_a?(Rugged::Tree)
+        annotate_tree(ref, path, object)
       end
 
-      def blame(ref, path)
-        deferred_method("blame -l -t -p #{ref} -- #{path}") do |output, s|
-          Dolt::Git::Blame.parse_porcelain(output)
-        end
+      def tree_entry(ref, path)
+        annotate_tree(ref, path, rev_parse("#{ref}:#{path}"))
+      end
+
+      def blame(ref, blob_path)
+        process = Dolt::Git.git(path, "blame -l -t -p #{ref} -- #{blob_path}")
+        Dolt::Git::Blame.parse_porcelain(process.stdout.read)
       end
 
       def log(ref, path, limit)
@@ -70,97 +61,61 @@ module Dolt
       end
 
       def tree_history(ref, path, limit = 1)
-        When.defer do |d|
-          rp = rev_parse("#{ref}:#{path}")
-          rp.errback { |err| d.reject(err) }
-          rp.callback do |tree|
-            if tree.class != Rugged::Tree
-              message = "#{ref}:#{path} is not a tree (#{tree.class.to_s})"
-              next d.reject(Exception.new(message))
-            end
+        tree = rev_parse("#{ref}:#{path}")
 
-            building = build_history(path || "./", ref, tree, limit)
-            building.callback { |history| d.resolve(history) }
-            building.errback { |err| d.reject(err) }
-          end
+        if tree.class != Rugged::Tree
+          message = "#{ref}:#{path} is not a tree (#{tree.class.to_s})"
+          raise Exception.new(message)
         end
+
+        annotate_history(path || "./", ref, tree, limit)
       end
 
       def readme(ref)
-        When.defer do |d|
-          t = self.tree(ref, "")
-          t.callback do |tree|
-            d.resolve(tree.entries.select do |e|
-                        e[:type] == :blob && e[:name].match(/readme/i)
-                      end)
-          end
-          t.errback { |err| d.resolve([]) }
+        tree(ref, "").entries.select do |e|
+          e[:type] == :blob && e[:name].match(/readme/i)
         end
+      rescue Exception => err
+        []
       end
 
       private
       def entry_history(ref, entry, limit)
-        deferred_method("log -n #{limit} #{ref} -- #{entry}") do |out, s|
-          Dolt::Git::Commit.parse_log(out)
-        end
+        process = Dolt::Git.git(path, "log -n #{limit} #{ref} -- #{entry}")
+        Dolt::Git::Commit.parse_log(process.stdout.read)
       end
 
-      def build_history(path, ref, entries, limit)
-        d = When.defer
+      def annotate_history(path, ref, entries, limit)
         resolve = lambda { |p| path == "" ? p : File.join(path, p) }
-        progress = When.all(entries.map do |e|
-                              entry_history(ref, resolve.call(e[:name]), limit)
-                            end)
-        progress.errback { |e| d.reject(e) }
-        progress.callback do |history|
-          d.resolve(entries.map { |e| e.merge({ :history => history.shift }) })
+        entries.map do |e|
+          e.merge(:history => entry_history(ref, resolve.call(e[:name]), limit))
         end
-        d
       end
 
-      def annotate_tree(d, ref, path, object)
+      def annotate_tree(ref, path, object)
         if object.class.to_s.match(/Blob/) || !object.find { |e| e[:type].nil? }
-          return d.resolve(object)
+          return object
         end
 
-        annotate_submodules(d, ref, path, object)
+        annotate_submodules(ref, path, object)
       end
 
-      def annotate_submodules(deferrable, ref, path, tree)
-        submodules(ref).callback do |submodules|
-          entries = tree.entries.map do |entry|
-            if entry[:type].nil?
-              mod = path == "" ? entry[:name] : File.join(path, entry[:name])
-              meta = submodules.find { |s| s[:path] == mod }
-              if meta
-                entry[:type] = :submodule
-                entry[:url] = meta[:url]
-              end
+      def annotate_submodules(ref, path, tree)
+        modules = submodules(ref)
+
+        entries = tree.entries.map do |entry|
+          if entry[:type].nil?
+            mod = path == "" ? entry[:name] : File.join(path, entry[:name])
+            meta = modules.find { |s| s[:path] == mod }
+            if meta
+              entry[:type] = :submodule
+              entry[:url] = meta[:url]
             end
-            entry
           end
-
-          deferrable.resolve(Dolt::Git::Tree.new(tree.oid, entries))
-        end
-      end
-
-      def deferred_method(cmd, &block)
-        d = When.defer
-        p = EMPessimistic::DeferrableChildProcess.open(git(cmd))
-
-        p.callback do |output, status|
-          d.resolve(block.call(output, status))
+          entry
         end
 
-        p.errback do |stderr, status|
-          d.reject(stderr)
-        end
-
-        d
-      end
-
-      def git(cmd)
-        "git --git-dir #{path} #{Shellwords.join(cmd.split(' '))}"
+        Dolt::Git::Tree.new(tree.oid, entries)
       end
     end
   end

@@ -1,6 +1,6 @@
 # encoding: utf-8
 #--
-#   Copyright (C) 2012-2013 Gitorious AS
+#   Copyright (C) 2013 Gitorious AS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -15,7 +15,28 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
+require "open3"
+require "libdolt/git/process"
+require "shellwords"
 
 module Dolt
-  VERSION = "0.16.0"
+  module Git
+    def self.shell(command)
+      stdin, stdout, stderr = Open3.popen3(command)
+      Dolt::Git::Process.new(stdin, stdout, stderr, $?)
+    end
+
+    def self.git(git_dir, command)
+      args = Shellwords.join(command.split(" "))
+      shell("#{binary} --git-dir #{git_dir} #{args}")
+    end
+
+    def self.binary
+      @binary ||= "git"
+    end
+
+    def self.binary=(path)
+      @binary = path
+    end
+  end
 end

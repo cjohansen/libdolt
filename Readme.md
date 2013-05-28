@@ -25,9 +25,8 @@ To install `dolt` you need Ruby, RubyGems and Python development files. The
 Python development files are required to support Pygments syntax highlighting.
 
 Note: Dolt uses [libgit2](http://libgit2.github.com) and its Ruby bindings,
-[Rugged](http://github.com/libgit2/rugged) through
-[em-rugged](http://gitorious.org/gitorious/em-rugged) for Git access where
-feasible. Currently, ``EMRugged`` relies on a version of `Rugged` that is not
+[Rugged](http://github.com/libgit2/rugged) for Git access where
+feasible. Currently, ``Dolt`` relies on a version of `Rugged` that is not
 yet released, so you have to build it yourself.
 [See em-rugged instructions](http://github.com/cjohansen/em-rugged).
 

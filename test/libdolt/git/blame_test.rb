@@ -19,8 +19,6 @@ require "test_helper"
 require "libdolt/git/blame"
 
 describe Dolt::Git::Blame do
-  include EM::MiniTest::Spec
-
   describe "parse" do
     before do
       blame = <<-GIT

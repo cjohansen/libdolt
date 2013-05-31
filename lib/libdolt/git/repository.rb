@@ -32,6 +32,7 @@ module Dolt
       def bare?; @repo.bare?; end
       def path; @repo.path; end
       def rev_parse(*args); @repo.rev_parse(*args); end
+      def rev_parse_oid(*args); @repo.rev_parse_oid(*args); end
       def refs(*args); @repo.refs(*args); end
       def lookup(*args); @repo.lookup(*args); end
 

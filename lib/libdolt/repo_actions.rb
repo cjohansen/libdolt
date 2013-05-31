@@ -65,9 +65,7 @@ module Dolt
 
     def archive(repo, ref, format)
       repository = resolve_repository(repo)
-      d = @archiver.archive(repository, ref, format)
-      d.callback { |filename| block.call(nil, filename) }
-      d.errback { |err| block.call(err, nil) }
+      @archiver.archive(repository, ref, format)
     end
 
     def repositories

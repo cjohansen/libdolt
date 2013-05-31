@@ -32,6 +32,8 @@ module Dolt
       def bare?; @repo.bare?; end
       def path; @repo.path; end
       def rev_parse(*args); @repo.rev_parse(*args); end
+      def refs(*args); @repo.refs(*args); end
+      def lookup(*args); @repo.lookup(*args); end
 
       def submodules(ref)
         config = rev_parse("#{ref}:.gitmodules")

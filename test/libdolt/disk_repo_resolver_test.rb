@@ -1,6 +1,6 @@
 # encoding: utf-8
 #--
-#   Copyright (C) 2012 Gitorious AS
+#   Copyright (C) 2013 Gitorious AS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -15,30 +15,28 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
-require "libdolt/git/repository"
+require "test_helper"
+require "fileutils"
+describe Dolt::DiskRepoResolver do
+  before do
+    @root = FileUtils.mkdir_p("/tmp/libdolt-tests/")
+    FileUtils.mkdir_p(File.join(@root, "single/.git"))
+    @resolver = Dolt::DiskRepoResolver.new(@root)
+  end
 
-module Dolt
-  class DiskRepoResolver
-    def initialize(root)
-      @root = root
-    end
+  after do
+    FileUtils.rm_f("/tmp/libdolt-tests")
+  end
 
-    def resolve(repo)
-      Dolt::Git::Repository.new(File.join(root, repo))
-    end
+  it "resolves non-bare repositories" do
+    assert @resolver.git_repo?("single")
+  end
 
-    def all
-      (Dir.entries(root).select do |e|
-          git_repo?(e)
-       end).sort
-    end
+  it "resolves bare repositories" do
+    assert @resolver.git_repo?("multi.git")
+  end
 
-    def git_repo?(dir)
-      return true if dir.split(".").last == "git"
-      File.exists? File.join(root, dir, ".git")
-    end
-
-    private
-    def root; @root; end
+  it "fails too" do
+    refute @resolver.git_repo?("nope")
   end
 end

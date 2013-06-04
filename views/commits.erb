@@ -1,26 +1,47 @@
+<%#
+# encoding: utf-8
+#--
+#   Copyright (C) 2012-2013 Gitorious AS
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#++
+%>
 <% @title = "History of #{path}" %>
-<div class="gts-browser">
-  <div id="gts-ref-selector-ph"></div>
-  <ul class="pull-right gts-blob-view">
-    <li><a href="<%= blob_url(repository_slug, ref, path) %>">Blob content</a></li>
-    <li><a href="<%= blame_url(repository_slug, ref, path) %>">Blame</a></li>
-    <li class="active">History</li>
-    <li><a href="<%= raw_url(repository_slug, ref, path) %>">Raw blob</a></li>
-  </ul>
-  <%= breadcrumb(repository_slug, ref, path) %>
-  <% commits.each do |commit| %>
-    <div class="gts-commit">
-      <p class="gts-log-message">
-        <span class="gts-commit-oid" data-gts-commit-oid="<%= commit[:oid] %>"><%= commit_oid(commit[:oid]) %></span>:
-        <%= commit[:summary] %>
-      </p>
-      <p>
-        <a class="event-author" href="/~">
-          <img width="24" height="24" src="<%= gravatar(commit[:author][:email]) %>" alt="avatar" class="gts-avatar">
-          <%= commit[:author][:name] %>
-        </a>
-        <span class="event-time"><%= commit[:date].strftime("%H:%M") %></span>
-      </p>
-    </div>
-  <% end %>
+<div class="container gts-body">
+  <div class="gts-browser">
+    <div id="gts-ref-selector-ph"></div>
+    <ul class="pull-right gts-blob-view">
+      <li><a href="<%= blob_url(repository_slug, ref, path) %>">Blob content</a></li>
+      <li><a href="<%= blame_url(repository_slug, ref, path) %>">Blame</a></li>
+      <li class="active">History</li>
+      <li><a href="<%= raw_url(repository_slug, ref, path) %>">Raw blob</a></li>
+    </ul>
+    <%= breadcrumb(repository_slug, ref, path) %>
+    <% commits.each do |commit| %>
+      <div class="gts-commit">
+        <p class="gts-log-message">
+          <span class="gts-commit-oid" data-gts-commit-oid="<%= commit[:oid] %>"><%= commit_oid(commit[:oid]) %></span>:
+          <%= commit[:summary] %>
+        </p>
+        <p>
+          <a class="event-author" href="/~">
+            <img width="24" height="24" src="<%= gravatar(commit[:author][:email]) %>" alt="avatar" class="gts-avatar">
+            <%= commit[:author][:name] %>
+          </a>
+          <span class="event-time"><%= commit[:date].strftime("%H:%M") %></span>
+        </p>
+      </div>
+    <% end %>
+  </div>
 </div>

@@ -1,7 +1,7 @@
 <%#
 # encoding: utf-8
 #--
-#   Copyright (C) 2012 Gitorious AS
+#   Copyright (C) 2012-2013 Gitorious AS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -17,11 +17,13 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 %>
-<h1><%= @title = "An error occurred" %></h1>
-<h2><%= CGI::escapeElement(error.respond_to?(:message) ? error.message : error).gsub(/</, "&lt;") %></h2>
-<% if error.respond_to?(:backtrace) && !error.backtrace.nil? %>
-  <ul>
-    <%= error.backtrace.map { |l| "<li>#{l}</li>" }.join("") %>
-  </ul>
-<% end %>
-<p><a href="<%= tree_url(repository_slug, ref, "") %>">Go back</a></p>
+<div class="container gts-body">
+  <h1><%= @title = "An error occurred" %></h1>
+  <h2><%= CGI::escapeElement(error.respond_to?(:message) ? error.message : error).gsub(/</, "&lt;") %></h2>
+  <% if error.respond_to?(:backtrace) && !error.backtrace.nil? %>
+    <ul>
+      <%= error.backtrace.map { |l| "<li>#{l}</li>" }.join("") %>
+    </ul>
+  <% end %>
+  <p><a href="<%= tree_url(repository_slug, ref, "") %>">Go back</a></p>
+</div>

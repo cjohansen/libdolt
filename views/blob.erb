@@ -1,7 +1,7 @@
 <%#
 # encoding: utf-8
 #--
-#   Copyright (C) 2012 Gitorious AS
+#   Copyright (C) 2012-2013 Gitorious AS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -17,15 +17,17 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 %>
-<% @title = "#{path} in #{repository_slug}:master" %>
-<div class="gts-file gts-browser">
-  <div id="gts-ref-selector-ph"></div>
-  <ul class="pull-right gts-blob-view">
-    <li class="active">Blob content</li>
-    <li><a href="<%= blame_url(repository_slug, ref, path) %>">Blame</a></li>
-    <li><a href="<%= history_url(repository_slug, ref, path) %>">History</a></li>
-    <li><a href="<%= raw_url(repository_slug, ref, path) %>">Raw blob</a></li>
-  </ul>
-  <%= breadcrumb(repository_slug, ref, path) %>
-  <%= format_blob(path, blob.text(nil, Encoding.default_external), repository_slug, ref) %>
+<div class="container gts-body">
+  <% @title = "#{path} in #{repository_slug}:master" %>
+  <div class="gts-file gts-browser">
+    <div id="gts-ref-selector-ph"></div>
+    <ul class="pull-right gts-blob-view">
+      <li class="active">Blob content</li>
+      <li><a href="<%= blame_url(repository_slug, ref, path) %>">Blame</a></li>
+      <li><a href="<%= history_url(repository_slug, ref, path) %>">History</a></li>
+      <li><a href="<%= raw_url(repository_slug, ref, path) %>">Raw blob</a></li>
+    </ul>
+    <%= breadcrumb(repository_slug, ref, path) %>
+    <%= format_blob(path, blob.text(nil, Encoding.default_external), repository_slug, ref) %>
+  </div>
 </div>

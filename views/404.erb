@@ -17,6 +17,8 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 %>
-<h1><%= @title = "No such path" %></h1>
-<h2><%= CGI::escapeElement(error.respond_to?(:message) ? error.message : error).gsub(/</, "&lt;") %></h2>
-<p><a href="<%= tree_url(repository_slug, ref, "") %>">Go back</a></p>
+<div class="container gts-body">
+  <h1><%= @title = "No such path" %></h1>
+  <h2><%= CGI::escapeElement(error.respond_to?(:message) ? error.message : error).gsub(/</, "&lt;") %></h2>
+  <p><a href="<%= tree_url(repository_slug, ref, "") %>">Go back</a></p>
+</div>

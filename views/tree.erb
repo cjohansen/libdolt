@@ -1,7 +1,7 @@
 <%#
   # encoding: utf-8
   #--
-  #   Copyright (C) 2012 Gitorious AS
+  #   Copyright (C) 2012-2013 Gitorious AS
   #
   #   This program is free software: you can redistribute it and/or modify
   #   it under the terms of the GNU Affero General Public License as published by
@@ -17,34 +17,36 @@
   #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #++
 %>
-<%
-@title = "#{path == '' ? './' : path} in #{ref}"
-levels = accumulate_path(partition_path(path, respond_to?(:maxdepth) ? maxdepth : nil))
-%>
-<div id="gts-ref-selector-ph"></div>
-<table class="table table-striped gts-tree-explorer" data-gts-tree-history="<%= tree_history_url(repository_slug, ref, path) %>">
-  <thead>
-    <tr>
-      <th colspan="<%= tree_table_padding_width(levels) + 1 %>">File</th>
-      <th class="gts-col-changed">Changed</th>
-      <th class="gts-col-commit" colspan="2">Last commit</th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= tree_context(repository_slug, ref, levels) %>
-    <% tree_entries(tree).each do |object| %>
+<div class="container gts-body">
+  <%
+    @title = "#{path == '' ? './' : path} in #{ref}"
+    levels = accumulate_path(partition_path(path, respond_to?(:maxdepth) ? maxdepth : nil))
+    %>
+  <div id="gts-ref-selector-ph"></div>
+  <table class="table table-striped gts-tree-explorer" data-gts-tree-history="<%= tree_history_url(repository_slug, ref, path) %>">
+    <thead>
       <tr>
-        <%= tree_table_padding_td(levels) %>
-        <td class="gts-name">
-          <a href="<%= object_url(repository_slug, ref, path, object) %>">
-            <i class="icon <%= object_icon_class(object) %>"></i>
-            <%= object[:name] %>
-          </a>
-        </td>
-        <td class="gts-commit-date"></td>
-        <td class="gts-commit-oid"></td>
-        <td></td>
+        <th colspan="<%= tree_table_padding_width(levels) + 1 %>">File</th>
+        <th class="gts-col-changed">Changed</th>
+        <th class="gts-col-commit" colspan="2">Last commit</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <%= tree_context(repository_slug, ref, levels) %>
+      <% tree_entries(tree).each do |object| %>
+        <tr>
+          <%= tree_table_padding_td(levels) %>
+          <td class="gts-name">
+            <a href="<%= object_url(repository_slug, ref, path, object) %>">
+              <i class="icon <%= object_icon_class(object) %>"></i>
+              <%= object[:name] %>
+            </a>
+          </td>
+          <td class="gts-commit-date"></td>
+          <td class="gts-commit-oid"></td>
+          <td></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

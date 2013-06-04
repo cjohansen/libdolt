@@ -1,7 +1,7 @@
 <%#
 # encoding: utf-8
 #--
-#   Copyright (C) 2012 Gitorious AS
+#   Copyright (C) 2012-2013 Gitorious AS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -17,26 +17,28 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 %>
-<% @title = "Blame #{path} in #{repository_slug}:master" %>
+<div class="container gts-body">
+  <% @title = "Blame #{path} in #{repository_slug}:master" %>
 
-<div class="gts-file gts-browser">
-  <div id="gts-ref-selector-ph"></div>
-  <ul class="pull-right gts-blob-view">
-    <li><a href="<%= blob_url(repository_slug, ref, path) %>">Blob content</a></li>
-    <li class="active">Blame</li>
-    <li><a href="<%= history_url(repository_slug, ref, path) %>">History</a></li>
-    <li><a href="<%= raw_url(repository_slug, ref, path) %>">Raw blob</a></li>
-  </ul>
-  <%= breadcrumb(repository_slug, ref, path) %>
-  <table class="gts-code-listing">
-    <% annotations = blame_annotations(blame) %>
-    <% lines = blame_lines(path, blame) %>
-    <% annotations.length.times do |i| %>
-      <tr>
-        <%= blame_annotation_cell(annotations[i]) %>
-        <td class="linenum L<%= i + 1 %>"><%= i + 1 %></td>
-        <%= blame_code_cell(lines[i]) %>
-      </tr>
-    <% end %>
-  </table>
+  <div class="gts-file gts-browser">
+    <div id="gts-ref-selector-ph"></div>
+    <ul class="pull-right gts-blob-view">
+      <li><a href="<%= blob_url(repository_slug, ref, path) %>">Blob content</a></li>
+      <li class="active">Blame</li>
+      <li><a href="<%= history_url(repository_slug, ref, path) %>">History</a></li>
+      <li><a href="<%= raw_url(repository_slug, ref, path) %>">Raw blob</a></li>
+    </ul>
+    <%= breadcrumb(repository_slug, ref, path) %>
+    <table class="gts-code-listing">
+      <% annotations = blame_annotations(blame) %>
+      <% lines = blame_lines(path, blame) %>
+      <% annotations.length.times do |i| %>
+        <tr>
+          <%= blame_annotation_cell(annotations[i]) %>
+          <td class="linenum L<%= i + 1 %>"><%= i + 1 %></td>
+          <%= blame_code_cell(lines[i]) %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
 </div>

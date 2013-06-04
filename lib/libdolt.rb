@@ -20,9 +20,7 @@ require "libdolt/disk_repo_resolver"
 require "libdolt/gitorious_repo_resolver"
 require "libdolt/repo_actions"
 require "libdolt/view"
-if RUBY_VERSION < "1.9"
-  require "libdolt/ruby19"
-end
+
 module Dolt
   def self.template_dir
     File.join(File.dirname(__FILE__), "..", "views")

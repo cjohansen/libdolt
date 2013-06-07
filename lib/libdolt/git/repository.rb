@@ -74,8 +74,8 @@ module Dolt
         annotate_history(path || "./", ref, tree, limit)
       end
 
-      def readme(ref)
-        tree(ref, "").entries.select do |e|
+      def readmes(ref, path="")
+        tree(ref, path).entries.select do |e|
           e[:type] == :blob && e[:name].match(/readme/i)
         end
       rescue Exception => err

@@ -158,7 +158,7 @@ describe Dolt::Git::Repository do
     end
   end
 
-  describe "#readme" do
+  describe "#readmes" do
     it "returns single readme" do
       def @repository.tree(ref, path)
         entries = [{ :type => :blob, :name => "Readme" },
@@ -171,7 +171,7 @@ describe Dolt::Git::Repository do
         end
       end
 
-      readmes = @repository.readme("master")
+      readmes = @repository.readmes("master")
 
       assert_equal 1, readmes.length
       assert_equal "Readme", readmes.first[:name]
@@ -185,7 +185,7 @@ describe Dolt::Git::Repository do
         OpenStruct.new(:entries => entries)
       end
 
-      readmes = @repository.readme("master")
+      readmes = @repository.readmes("master")
       assert_equal 0, readmes.length
     end
 
@@ -197,7 +197,7 @@ describe Dolt::Git::Repository do
         OpenStruct.new(:entries => entries)
       end
 
-      readmes = @repository.readme("master")
+      readmes = @repository.readmes("master")
       assert_equal 3, readmes.length
     end
 
@@ -206,8 +206,22 @@ describe Dolt::Git::Repository do
         raise Exception.new("Unknown reason")
       end
 
-      readmes = @repository.readme("master")
+      readmes = @repository.readmes("master")
       assert_equal 0, readmes.length
+    end
+
+    it "finds readmes in a path" do
+      def @repository.tree(ref, path)
+        if path == "lib"
+          entries = [{ :type => :blob, :name => "Readme.rdoc" }]
+        else
+          entries = []
+        end
+        OpenStruct.new(:entries => entries)
+      end
+
+      assert_equal 0, @repository.readmes("master").length
+      assert_equal 1, @repository.readmes("master","lib").length
     end
   end
 end

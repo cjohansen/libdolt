@@ -32,7 +32,7 @@ module Dolt
     end
 
     def tree(repo, ref, path)
-      repo_action(repo, ref, path, :tree, :tree, ref, path)
+      repo_action(repo, ref, path, :tree, :tree, ref, path).merge({:readme => readme(repo, ref, path)})
     end
 
     def tree_entry(repo, ref, path)
@@ -100,6 +100,16 @@ module Dolt
       names.select { |n| n =~ /#{type}/ }.map do |n|
         [n.sub(/^refs\/#{type}\//, ""), repository.rev_parse_oid(n)]
       end
+    end
+
+    def readme(repo_name, ref, path)
+      repository = resolve_repository(repo_name)
+      readmes = repository.readmes(ref, path)
+      readme = readmes.detect {|blob| Makeup::Markup.can_render?(blob[:name])}
+      return unless readme
+      blob_path = File.join(*[path, readme[:name]].reject { |p| p == "" })
+      blob = repository.blob(ref, blob_path)
+      {:blob => blob, :path => blob_path}
     end
   end
 

@@ -44,6 +44,10 @@ module Dolt
         []
       end
 
+      def blob(ref, path)
+        rev_parse("#{ref}:#{path}")
+      end
+
       def tree(ref, path)
         object = rev_parse("#{ref}:#{path}")
         raise StandardError.new("Not a tree") if !object.is_a?(Rugged::Tree)

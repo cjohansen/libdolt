@@ -34,6 +34,7 @@ class Repository
   def log(ref, path, limit); end
   def refs; end
   def tree_history(ref, path, count); end
+  def readmes(ref, path); []; end
 
   def self.stub_ref(name, ref)
     self.refs[name] = ref
@@ -100,7 +101,7 @@ describe Dolt::RepoActions do
     it "resolves repository" do
       @actions.tree("gitorious", "master", "app")
 
-      assert_equal ["gitorious"], @resolver.resolved.map(&:name)
+      assert_equal ["gitorious","gitorious"], @resolver.resolved.map(&:name)
     end
 
     it "returns tree, repo and ref" do
@@ -112,7 +113,8 @@ describe Dolt::RepoActions do
           :tree => @tree,
           :repository_slug => "gitorious",
           :ref =>  "babd120",
-          :path => "app"
+          :path => "app",
+          :readme => nil
         }, data)
     end
   end

@@ -33,11 +33,12 @@ describe "tree template" do
   def render(path, tree, options = {})
     renderer = prepare_renderer(options)
     renderer.render(:tree, {
-                      :tree => tree,
-                      :repository_slug => @repo,
-                      :ref => options[:ref] || "master",
-                      :path => path
-                    })
+        :tree => tree,
+        :repository_slug => @repo,
+        :ref => options[:ref] || "master",
+        :path => path,
+        :readme => nil
+      })
   end
 
   it "renders empty tree" do

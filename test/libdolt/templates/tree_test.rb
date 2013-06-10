@@ -32,12 +32,13 @@ describe "tree template" do
 
   def render(path, tree, options = {})
     renderer = prepare_renderer(options)
+    readme = options[:readme] || nil
     renderer.render(:tree, {
         :tree => tree,
         :repository_slug => @repo,
         :ref => options[:ref] || "master",
         :path => path,
-        :readme => nil
+        :readme => readme
       })
   end
 
@@ -60,5 +61,17 @@ describe "tree template" do
 
     assert_match /icon-folder-open/, markup
     assert_match /tree\/master:app"/, markup
+  end
+
+  it "renders readmes" do
+    tree = Tree.new([
+        {:type => :tree, :name => "lib"},
+        {:type => :blob, :name => "README.md"}
+      ])
+    blob = mock(:text => "This is a readme")
+    readme = {:blob => blob, :path => "README.md"}
+    markup = render("", tree, :readme => readme)
+
+    assert_match /<h2>Readme/, markup
   end
 end

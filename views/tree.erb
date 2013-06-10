@@ -50,6 +50,7 @@
     </tbody>
   </table>
   <% if readme %>
+  <h2>Readme</h2>
     <%= format_blob(readme[:path], readme[:blob].text(nil, Encoding.default_external), repository_slug, ref) %>
   <% end %>
 </div>

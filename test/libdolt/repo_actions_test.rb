@@ -32,6 +32,7 @@ class Repository
   def rev_parse_oid(ref); self.class.refs[ref] || nil; end
   def blame(ref, path); end
   def log(ref, path, limit); end
+  def blob(ref, path); end
   def refs; end
   def tree_history(ref, path, count); end
   def readmes(ref, path); []; end
@@ -116,6 +117,19 @@ describe Dolt::RepoActions do
           :path => "app",
           :readme => nil
         }, data)
+    end
+  end
+
+  describe "readmes" do
+    it "includes readmes which can be rendered" do
+      readme_name = "README.org"
+      Repository.any_instance.stubs(:tree).returns(@tree)
+      readmes = [{:name => readme_name, :blob => nil}]
+      Repository.any_instance.stubs(:readmes).with("fc00ff","lib").returns(readmes)
+      Makeup::Markup.stubs(:can_render?).with(readme_name).returns(true)
+      data = @actions.tree("gitorious","fc00ff","lib")
+      repo = @resolver.resolved.last
+      assert_equal "lib/#{readme_name}", data[:readme][:path]
     end
   end
 

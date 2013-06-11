@@ -34,8 +34,7 @@ module Dolt
     end
 
     def git_repo?(dir)
-      return true if dir.split(".").last == "git"
-      File.exists? File.join(root, dir, ".git")
+      Dolt::Git.git_repo?(File.join(root, dir))
     end
 
     private

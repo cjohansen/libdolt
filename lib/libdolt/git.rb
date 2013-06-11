@@ -38,5 +38,10 @@ module Dolt
     def self.binary=(path)
       @binary = path
     end
+
+    def self.git_repo?(path)
+      return true if path.split(".").last == "git"
+      File.exists?(File.join(path, ".git"))
+    end
   end
 end

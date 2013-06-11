@@ -72,6 +72,6 @@ describe "tree template" do
     readme = {:blob => blob, :path => "README.md"}
     markup = render("", tree, :readme => readme)
 
-    assert_match /<h1>README.md<\/h1>/, markup
+    assert_match /<h[1-6]>README.md<\/h[1-6]>/, markup
   end
 end

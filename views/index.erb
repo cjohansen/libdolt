@@ -19,9 +19,18 @@
 %>
 <div class="container gts-body">
   <h1><%= @title = "All repositories" %></h1>
-  <ul>
-    <% repositories.each do |repo| %>
-      <li><a href="/<%= repo %>/tree/master:"><%= repo %></a></li>
+  <table class="table table-striped">
+    <tbody>
+      <% repositories.each do |repo| %>
+      <tr>
+        <td>
+          <a href="/<%= repo %>/tree/master:">
+            <i class="icon-folder-close"></i>
+            <%= repo %>
+          </a>
+        </td>
+      </tr>
     <% end %>
-  </ul>
+    </tbody>
+  </table>
 </div>

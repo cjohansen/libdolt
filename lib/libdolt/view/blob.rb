@@ -70,7 +70,7 @@ The content you're attempting to browse appears to be binary.
         end
 
         "<pre class=\"#{class_names.join(' ')}\">" +
-          "<ol class=\"linenums\">#{lines}</ol></pre>"
+          "<ol class=\"linenums gts-lines\">#{lines}</ol></pre>"
       end
     end
   end

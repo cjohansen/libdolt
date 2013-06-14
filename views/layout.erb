@@ -22,7 +22,7 @@
     <meta charset="utf-8">
     <title><%= @title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/css/gitorious.css" rel="stylesheet">
+    <link href="/dist/gitorious3.min.css" rel="stylesheet">
     <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/lib/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
   </head>
@@ -44,13 +44,16 @@
           </a>
         </p>
         <p>
-          Dolt is part of <a href="http://gitorious.org">Gitorious</a>. Dolt
+          Dolt is part of <a href="http://getgitorious.com">Gitorious</a>. Dolt
           (like Gitorious) is free software licensed under
           the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero
           General Public License (AGPL)</a> unless noted otherwise.
         </p>
       </div>
     </div>
+    <% if defined?(repository_slug) %>
+      <script data-gts-env-repository-refs-url="<%= refs_url(repository_slug) %>"></script>
+    <% end  %>
     <script src="/dist/gitorious3.min.js"></script>
   </body>
 </html>

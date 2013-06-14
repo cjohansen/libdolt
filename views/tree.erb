@@ -22,7 +22,7 @@
     @title = "#{path == '' ? './' : path} in #{ref}"
     levels = accumulate_path(partition_path(path, respond_to?(:maxdepth) ? maxdepth : nil))
     %>
-  <div id="gts-ref-selector-ph"></div>
+  <div class="gts-ref-selector-ph"></div>
   <table class="table table-striped gts-tree-explorer" data-gts-env-tree-history-url="<%= tree_history_url(repository_slug, ref, path) %>">
     <thead>
       <tr>

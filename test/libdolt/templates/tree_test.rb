@@ -47,7 +47,7 @@ describe "tree template" do
     markup = render("app/models", tree)
 
     assert_match /<table class="table table-striped gts-tree-explorer"/, markup
-    assert_match /data-gts-tree-history="/, markup
+    assert_match /data-gts-env-tree-history-url="/, markup
   end
 
   it "renders context for non-empty tree" do

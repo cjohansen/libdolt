@@ -22,6 +22,10 @@ module Dolt
       def repo_url(repository, url)
         url
       end
+
+      def refs_url(repository)
+        "/refs"
+      end
     end
   end
 end

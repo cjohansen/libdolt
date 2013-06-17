@@ -54,7 +54,7 @@
     <div class="gts-page-header">
       <h2><%= readme[:path] %></h2>
     </div>
-    <%= format_blob(readme[:path], readme[:blob].text(nil, Encoding.default_external), repository_slug, ref) %>
+    <%= format_blob(readme[:path], readme[:blob].text(nil, defined?(Encoding) ? Encoding.default_external : nil), repository_slug, ref) %>
   </div>
   <% end %>
 </div>

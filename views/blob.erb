@@ -28,6 +28,6 @@
       <li><a href="<%= raw_url(repository_slug, ref, path) %>">Raw blob</a></li>
     </ul>
     <%= breadcrumb(repository_slug, ref, path) %>
-    <%= format_blob(path, blob.text(nil, Encoding.default_external), repository_slug, ref) %>
+    <%= format_blob(path, blob.text(nil, defined?(Encoding) ? Encoding.default_external : nil), repository_slug, ref) %>
   </div>
 </div>

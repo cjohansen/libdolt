@@ -23,6 +23,9 @@ require "stringio"
 
 Bundler.require(:default, :test)
 
+# Ensure consistent timing
+ENV["TZ"] = "UTC-2"
+
 module Dolt
   def self.fixture_repo_path
     File.join(File.dirname(__FILE__), "fixtures/dolt-test-repo.git")

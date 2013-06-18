@@ -22,31 +22,31 @@ require "ostruct"
 require "mocha/setup"
 
 describe Dolt::Git::Repository do
-  before { @repository = Dolt::Git::Repository.new(".") }
+  before { @repository = Dolt::Git::Repository.new(Dolt.fixture_repo_path) }
 
   describe "#submodules" do
     it "returns list of submodules" do
-      submodules = @repository.submodules("c1f6cd9")
+      submodules = @repository.submodules("60eebb9")
       url = "git://gitorious.org/gitorious/ui3.git"
 
       assert_equal [{ :path => "vendor/ui", :url => url }], submodules
     end
 
     it "returns empty array if no submodules" do
-      submodules = @repository.submodules("26139a3")
+      submodules = @repository.submodules("fc5f5fb")
       assert_equal [], submodules
     end
   end
 
   describe "#tree" do
     it "includes submodule data for trees" do
-      tree = @repository.tree("3dc532f", "vendor")
+      tree = @repository.tree("60eebb9", "vendor")
 
       assert_equal({
           :type => :submodule,
           :filemode => 57344,
           :name => "ui",
-          :oid => "d167e3e1c17a27e4cf459dd380670801b0659659",
+          :oid => "77c88454e83e59772e9bf460ef22251cc9d63f9f",
           :url => "git://gitorious.org/gitorious/ui3.git"
         }, tree.entries.first)
     end
@@ -54,82 +54,89 @@ describe Dolt::Git::Repository do
 
   describe "#tree_entry" do
     it "includes submodule data for trees" do
-      tree = @repository.tree_entry("3dc532f", "vendor")
+      tree = @repository.tree_entry("60eebb9", "vendor")
 
       assert_equal({
           :type => :submodule,
           :filemode => 57344,
           :name => "ui",
-          :oid => "d167e3e1c17a27e4cf459dd380670801b0659659",
+          :oid => "77c88454e83e59772e9bf460ef22251cc9d63f9f",
           :url => "git://gitorious.org/gitorious/ui3.git"
         }, tree.entries.first)
     end
 
     it "returns blob" do
-      blob = @repository.tree_entry("3dc532f", "Gemfile")
+      blob = @repository.tree_entry("fc5f5fb", "README.org")
 
       assert blob.is_a?(Rugged::Blob)
-      assert_equal "source \"http://rubygems.org\"\n\ngemspec\n", blob.content
+      assert_equal "* This is a readme\n  It even has some text in it\n", blob.content
     end
   end
 
   describe "#blame" do
     it "returns blame" do
-      blame = @repository.blame("master", "Gemfile")
+      blame = @repository.blame("master", "README.org")
       assert Dolt::Git::Blame === blame
     end
 
     it "separates tree-like and path" do
-      cmd = "git --git-dir #{@repository.path} blame -l -t -p master -- Gemfile"
+      cmd = "git --git-dir #{@repository.path} blame -l -t -p master -- README.org"
       Dolt::Git.expects(:shell).with(cmd).returns(Dolt::FakeProcess.new(0))
-      @repository.blame("master", "Gemfile")
+      @repository.blame("master", "README.org")
     end
 
     it "does not allow injecting evil commands" do
-      cmd = "git --git-dir #{@repository.path} blame -l -t -p master -- Gemfile\\; rm -fr /tmp"
+      cmd = "git --git-dir #{@repository.path} blame -l -t -p master -- README.org\\; rm -fr /tmp"
       Dolt::Git.expects(:shell).with(cmd).returns(Dolt::FakeProcess.new(0))
-      @repository.blame("master", "Gemfile; rm -fr /tmp")
+      @repository.blame("master", "README.org; rm -fr /tmp")
     end
   end
 
   describe "#log" do
     it "returns commits" do
-      log = @repository.log("master", "dolt.gemspec", 2)
+      log = @repository.log("master", "README.org", 2)
       assert_equal 2, log.length
       assert Hash === log[0]
+
+      log = @repository.log("master", "README.org", 1)
+      assert_equal 1, log.length
     end
   end
 
   describe "#tree_history" do
     it "fails if path is not a tree" do
-      assert_raises Exception do |err|
-        tree = @repository.tree_history("master", "Gemfile")
+      begin
+        tree = @repository.tree_history("master", "README.org")
+        raise "Should've raised an Exception"
+      rescue Exception => err
         assert_match /not a tree/, err.message
       end
     end
 
     it "fails if path does not exist in ref" do
-      assert_raises Rugged::IndexerError do |err|
-        tree = @repository.tree_history("26139a3", "test")
+      begin
+        tree = @repository.tree_history("fc5f5fb", "test")
+        raise "Should've raised an Rugged::IndexerError"
+      rescue Rugged::IndexerError => err
         assert_match /does not exist/, err.message
       end
     end
 
     it "returns tree with history" do
-      log = @repository.tree_history("48ffbf7", "")
+      log = @repository.tree_history("e8d33ae", "")
 
-      assert_equal 11, log.length
+      assert_equal 4, log.length
       expected = {
         :type => :blob,
         :oid => "e90021f89616ddf86855d05337c188408d3b417e",
         :filemode => 33188,
         :name => ".gitmodules",
         :history => [{
-            :oid => "906d67b4f3e5de7364ba9b57d174d8998d53ced6",
+            :oid => "60eebb9021a6ce7d582c2f2d4aa5bfb3672150ae",
             :author => { :name => "Christian Johansen",
               :email => "christian@cjohansen.no" },
-            :summary => "Working Moron server for viewing blobs",
-            :date => Time.parse("Mon Sep 10 15:07:39 +0200 2012"),
+            :summary => "Add submodule",
+            :date => Time.parse("Tue Jun 18 09:01:48 +0200 2013"),
             :message => ""
           }]
       }
@@ -138,19 +145,19 @@ describe Dolt::Git::Repository do
     end
 
     it "returns nested tree with history" do
-      log = @repository.tree_history("48ffbf7", "lib")
+      log = @repository.tree_history("e8d33ae", "lib")
 
       expected = [{
-          :type => :tree,
-          :oid => "58f84405b588699b24c619aa4cd83669c5623f88",
-          :filemode => 16384,
-          :name => "dolt",
+          :type => :blob,
+          :oid => "85026eda8302b98fa54cc24445a118028865a2e2",
+          :filemode => 33188,
+          :name => "foo.rb",
           :history => [{
-              :oid => "8ab4f8c42511f727244a02aeee04824891610bbd",
-              :author => { :name => "Christian Johansen",
-                :email => "christian@gitorious.com" },
-              :summary => "New version",
-              :date => Time.parse("Mon Oct 1 16:34:00 +0200 2012"),
+              :oid => "fc5f5fb50b435e183925b341909610aace90a413",
+              :author => { :name => "Marius Mathiesen",
+                :email => "marius@gitorious.com" },
+              :summary => "Stuff and stuff",
+              :date => Time.parse("Tue Jun 11 13:10:31 +0200 2013"),
               :message => ""
             }]
         }]

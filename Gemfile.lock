@@ -45,5 +45,5 @@ DEPENDENCIES
   minitest (~> 2.0)
   mocha
   rake (~> 0.9)
-  redcarpet (= 2.2.0)
+  redcarpet (~> 2.2)
   tiltout (~> 1.4)

@@ -25,8 +25,7 @@ class Resolver
   def initialize; @resolved = []; end
 
   def resolve(repo)
-    dot_git = File.dirname(__FILE__) + "/../fixtures/dolt-test-repo.git"
-    repository = Dolt::Git::Repository.new(dot_git)
+    repository = Dolt::Git::Repository.new(Dolt.fixture_repo_path)
     @resolved << repository
     repository
   end

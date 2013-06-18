@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "minitest", "~> 2.0"
   s.add_development_dependency "rake", "~> 0.9"
-  s.add_development_dependency "redcarpet", "2.2.0"
+  s.add_development_dependency "redcarpet", "~> 2.2"
   s.add_development_dependency "tiltout", "~>1.4"
   s.add_development_dependency "mocha"
 

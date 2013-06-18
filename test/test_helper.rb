@@ -24,6 +24,10 @@ require "stringio"
 Bundler.require(:default, :test)
 
 module Dolt
+  def self.fixture_repo_path
+    File.join(File.dirname(__FILE__), "fixtures/dolt-test-repo.git")
+  end
+
   module Html
     def select(html, tag_name)
       html.scan(/<#{tag_name}[^>]*>.*?<\/#{tag_name}>/m)

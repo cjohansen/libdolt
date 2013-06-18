@@ -39,7 +39,9 @@ module Dolt
       repository = resolve_repository(repo)
       result = repository.tree_entry(ref, path)
       key = result.class.to_s.match(/Blob/) ? :blob : :tree
-      tpl_data(repository, ref, path, { key => result, :type => key })
+      hash = tpl_data(repository, ref, path, { key => result, :type => key })
+      hash[:readme] = readme(repo, ref, path) if key == :tree
+      hash
     end
 
     def blame(repo, ref, path)

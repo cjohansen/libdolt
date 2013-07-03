@@ -6,7 +6,7 @@ PATH
       json (~> 1.7)
       makeup (~> 0.2)
       mime-types (~> 1.19)
-      rugged (= 0.17.0.b6)
+      rugged (= 0.18.0.gh.de28323)
       tzinfo (~> 0.3)
 
 GEM
@@ -25,12 +25,12 @@ GEM
     mocha (0.14.0)
       metaclass (~> 0.0.1)
     posix-spawn (0.3.6)
-    pygments.rb (0.5.0)
+    pygments.rb (0.5.1)
       posix-spawn (~> 0.3.6)
       yajl-ruby (~> 1.1.0)
     rake (0.9.6)
     redcarpet (2.2.0)
-    rugged (0.17.0.b6)
+    rugged (0.18.0.gh.de28323)
     tilt (1.4.1)
     tiltout (1.4.0)
       tilt (~> 1.3)

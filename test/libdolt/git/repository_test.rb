@@ -117,7 +117,7 @@ describe Dolt::Git::Repository do
       begin
         tree = @repository.tree_history("fc5f5fb", "test")
         raise "Should've raised an Rugged::IndexerError"
-      rescue Rugged::IndexerError => err
+      rescue Rugged::TreeError => err
         assert_match /does not exist/, err.message
       end
     end

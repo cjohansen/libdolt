@@ -39,7 +39,7 @@ module Dolt
       def submodules(ref)
         config = rev_parse("#{ref}:.gitmodules")
         Dolt::Git::Submodule.parse_config(config.content)
-      rescue Rugged::IndexerError => err
+      rescue Rugged::TreeError => err
         # Raised if .gitmodules cannot be found, which means no submodules
         []
       end

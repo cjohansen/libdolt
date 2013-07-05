@@ -19,7 +19,7 @@ if RUBY_VERSION > "1.9"
   require "simplecov"
   SimpleCov.start
 end
- "bundler/setup"
+require "bundler/setup"
 require "minitest/autorun"
 require "libdolt/view"
 require "tiltout"

@@ -48,11 +48,12 @@ describe Dolt::RepositoryLookup do
   end
 
   describe "#blob" do
-    it "returns path, blob, repo, ref and base_tree_url" do
+    it "returns path, blob, repo, ref, filemode and base_tree_url" do
       data = @lookup.blob("gitorious", "fc5f5fb50b435e18", "lib/foo.rb")
       assert_equal "gitorious", data[:repository_slug]
       assert_equal "fc5f5fb50b435e18", data[:ref]
       assert Rugged::Blob === data[:blob]
+      assert_equal "100644", data[:filemode]
     end
   end
 
@@ -83,12 +84,13 @@ describe Dolt::RepositoryLookup do
       assert_equal :tree, data[:type]
     end
 
-    it "returns blob, repo and ref" do
+    it "returns blob, filemode, repo and ref" do
       data = @lookup.tree_entry("gitorious", "fc5f5fb50b435e18", "lib/foo.rb")
 
       assert_equal "lib/foo.rb", data[:path]
       assert_equal "fc5f5fb50b435e18", data[:ref]
       assert_equal :blob, data[:type]
+      assert_equal "100644", data[:filemode]
     end
   end
 
@@ -98,12 +100,13 @@ describe Dolt::RepositoryLookup do
       assert_equal 1, @resolver.resolved.size
     end
 
-    it "returns blame, repo and ref" do
+    it "returns blame, filemode, repo and ref" do
       data = @lookup.blame("gitorious", "fc5f5fb50b435e18", "lib")
       assert Dolt::Git::Blame === data[:blame]
       assert_equal "gitorious", data[:repository_slug]
       assert_equal "fc5f5fb50b435e18", data[:ref]
       assert_equal "lib", data[:path]
+      assert_equal "40000", data[:filemode]
     end
   end
 

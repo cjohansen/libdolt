@@ -30,7 +30,8 @@ module Dolt
     def blob(repo, ref, path)
       repository = resolve_repository(repo)
       tpl_data(repository, ref, path, {
-          :blob => repository.rev_parse("#{ref}:#{path}")
+          :blob => repository.rev_parse("#{ref}:#{path}"),
+          :filemode => filemode(repository, ref, path)
         })
     end
 
@@ -47,13 +48,15 @@ module Dolt
       key = result.class.to_s.match(/Blob/) ? :blob : :tree
       hash = tpl_data(repository, ref, path, { key => result, :type => key })
       hash[:readme] = readme(repo, ref, path) if key == :tree
+      hash[:filemode] = filemode(repository, ref, path) if key == :blob
       hash
     end
 
     def blame(repo, ref, path)
       repository = resolve_repository(repo)
       tpl_data(repository, ref, path, {
-          :blame => repository.blame(ref, path)
+          :blame => repository.blame(ref, path),
+          :filemode => filemode(repository, ref, path)
         })
     end
 
@@ -119,6 +122,13 @@ module Dolt
       blob_path = File.join(*[path, readme[:name]].reject { |p| p == "" })
       blob = repository.blob(ref, blob_path)
       {:blob => blob, :path => blob_path}
+    end
+
+    def filemode(repo, ref, path)
+      file = File.basename(path)
+      refspec = "#{ref}:#{File.dirname(path).sub(/^\.$/, '')}"
+      entry = repo.rev_parse(refspec).find { |e| e[:name] == file }
+      entry.nil? ? nil : entry[:filemode].to_s(8)
     end
   end
 

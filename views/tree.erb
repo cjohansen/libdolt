@@ -50,11 +50,18 @@
     </tbody>
   </table>
   <% if readme %>
-  <div class="gts-readme" id="readme">
-    <div class="gts-page-header">
-      <h4><%= readme[:path] %></h4>
+    <div class="gts-readme" id="readme">
+      <div class="gts-page-header">
+        <h4><%= readme[:path] %></h4>
+      </div>
+      <% begin %>
+        <%= format_blob(readme[:path], readme[:blob].text(nil, defined?(Encoding) ? Encoding.default_external : nil), repository_slug, ref) %>
+      <% rescue StandardError => err %>
+        <p>
+          <em>Failed to render <%= readme[:path] %></em>
+          <!-- <%= err.message %> -->
+        </p>
+      <% end %>
     </div>
-    <%= format_blob(readme[:path], readme[:blob].text(nil, defined?(Encoding) ? Encoding.default_external : nil), repository_slug, ref) %>
-  </div>
   <% end %>
 </div>

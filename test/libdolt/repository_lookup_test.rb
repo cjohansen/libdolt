@@ -16,7 +16,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 require "test_helper"
-require "libdolt/repo_actions"
+require "libdolt/repository_lookup"
 require "ostruct"
 require "mocha/setup"
 
@@ -41,15 +41,15 @@ class MetaResolver < Resolver
   end
 end
 
-describe Dolt::RepoActions do
+describe Dolt::RepositoryLookup do
   before do
     @resolver = Resolver.new
-    @actions = Dolt::RepoActions.new(@resolver)
+    @lookup = Dolt::RepositoryLookup.new(@resolver)
   end
 
   describe "#blob" do
     it "returns path, blob, repo, ref and base_tree_url" do
-      data = @actions.blob("gitorious", "fc5f5fb50b435e18", "lib/foo.rb")
+      data = @lookup.blob("gitorious", "fc5f5fb50b435e18", "lib/foo.rb")
       assert_equal "gitorious", data[:repository_slug]
       assert_equal "fc5f5fb50b435e18", data[:ref]
       assert Rugged::Blob === data[:blob]
@@ -58,7 +58,7 @@ describe Dolt::RepoActions do
 
   describe "#tree" do
     it "returns tree, repo and ref" do
-      data = @actions.tree("gitorious", "fc5f5fb50b435e18", "lib")
+      data = @lookup.tree("gitorious", "fc5f5fb50b435e18", "lib")
       repo = @resolver.resolved.last
       assert_equal "264c348a80906538018616fa16fc35d04bdf38b0", data[:tree].oid
       assert_equal "fc5f5fb50b435e18", data[:ref]
@@ -70,7 +70,7 @@ describe Dolt::RepoActions do
     it "includes readmes which can be rendered" do
       readme_name = "README.org"
       Makeup::Markup.stubs(:can_render?).with(readme_name).returns(true)
-      data = @actions.tree("gitorious","fc5f5fb50b435e18","")
+      data = @lookup.tree("gitorious","fc5f5fb50b435e18","")
       repo = @resolver.resolved.last
       assert_equal "#{readme_name}", data[:readme][:path]
     end
@@ -78,13 +78,13 @@ describe Dolt::RepoActions do
 
   describe "#tree_entry" do
     it "returns tree, repo and ref" do
-      data = @actions.tree_entry("gitorious", "fc5f5fb50b435e18", "")
+      data = @lookup.tree_entry("gitorious", "fc5f5fb50b435e18", "")
       repo = @resolver.resolved.last
       assert_equal :tree, data[:type]
     end
 
     it "returns blob, repo and ref" do
-      data = @actions.tree_entry("gitorious", "fc5f5fb50b435e18", "lib/foo.rb")
+      data = @lookup.tree_entry("gitorious", "fc5f5fb50b435e18", "lib/foo.rb")
 
       assert_equal "lib/foo.rb", data[:path]
       assert_equal "fc5f5fb50b435e18", data[:ref]
@@ -94,12 +94,12 @@ describe Dolt::RepoActions do
 
   describe "#blame" do
     it "resolves repository" do
-      @actions.blame("gitorious", "master", "lib")
+      @lookup.blame("gitorious", "master", "lib")
       assert_equal 1, @resolver.resolved.size
     end
 
     it "returns blame, repo and ref" do
-      data = @actions.blame("gitorious", "fc5f5fb50b435e18", "lib")
+      data = @lookup.blame("gitorious", "fc5f5fb50b435e18", "lib")
       assert Dolt::Git::Blame === data[:blame]
       assert_equal "gitorious", data[:repository_slug]
       assert_equal "fc5f5fb50b435e18", data[:ref]
@@ -109,7 +109,7 @@ describe Dolt::RepoActions do
 
   describe "#history" do
     it "returns commits, repo and ref" do
-      data = @actions.history("gitorious", "fc5f5fb50b435e18", "app", 2)
+      data = @lookup.history("gitorious", "fc5f5fb50b435e18", "app", 2)
 
       assert_equal({
           :commits => [],
@@ -122,7 +122,7 @@ describe Dolt::RepoActions do
 
   describe "#refs" do
     it "returns repositories, tags and heads" do
-      data = @actions.refs("gitorious")
+      data = @lookup.refs("gitorious")
 
       assert data[:tags].detect {|name, ref|
         name == "testable-tag" && ref == "fc5f5fb50b435e183925b341909610aace90a413"
@@ -132,7 +132,7 @@ describe Dolt::RepoActions do
 
   describe "#tree_history" do
     it "returns repository, path, ref and history" do
-      data = @actions.tree_history("gitorious", "testable-tag", "", 1)
+      data = @lookup.tree_history("gitorious", "testable-tag", "", 1)
       assert_equal "testable-tag", data[:ref]
       assert_equal 2, data[:tree].length
       assert_equal "", data[:path]
@@ -142,8 +142,8 @@ describe Dolt::RepoActions do
   describe "repository meta data" do
     it "is returned with other data" do
       resolver = MetaResolver.new
-      actions = Dolt::RepoActions.new(resolver)
-      data = actions.blob("gitorious", "fc5f5fb50b435e18", "lib")
+      lookup = Dolt::RepositoryLookup.new(resolver)
+      data = lookup.blob("gitorious", "fc5f5fb50b435e18", "lib")
 
       assert_equal "Meta data is cool", data[:repository_meta]
     end
@@ -152,7 +152,7 @@ describe Dolt::RepoActions do
   describe "#rev_parse_oid" do
     it "resolves ref oid" do
       oid = "fc5f5fb50b435e183925b341909610aace90a413"
-      assert_equal oid, @actions.rev_parse_oid("gitorious", "testable-tag")
+      assert_equal oid, @lookup.rev_parse_oid("gitorious", "testable-tag")
     end
  end
 end

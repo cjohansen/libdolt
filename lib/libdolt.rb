@@ -18,7 +18,7 @@
 require "libdolt/version"
 require "libdolt/disk_repo_resolver"
 require "libdolt/gitorious_repo_resolver"
-require "libdolt/repo_actions"
+require "libdolt/repository_lookup"
 require "libdolt/view"
 
 module Dolt

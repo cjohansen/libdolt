@@ -21,7 +21,7 @@ require "time"
 class Time; def to_json(*args); "\"#{iso8601}\""; end; end
 
 module Dolt
-  class RepoActions
+  class RepositoryLookup
     def initialize(repo_resolver, archiver = nil)
       @repo_resolver = repo_resolver
       @archiver = archiver

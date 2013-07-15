@@ -35,11 +35,11 @@
           <%= commit[:summary] %>
         </p>
         <p>
-          <a class="event-author" href="/~">
+          <span class="gts-commit-author">
             <img width="24" height="24" src="<%= gravatar(commit[:author][:email]) %>" alt="avatar" class="gts-avatar">
             <%= commit[:author][:name] %>
-          </a>
-          <span class="event-time"><%= commit[:date].strftime("%H:%M") %></span>
+          </span>
+          <span class="gts-commit-time"><%= commit[:date].strftime("%H:%M") %></span>
         </p>
       </div>
     <% end %>

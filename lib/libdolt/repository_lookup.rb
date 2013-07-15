@@ -28,11 +28,17 @@ module Dolt
     end
 
     def blob(repo, ref, path)
-      repo_action(repo, ref, path, :blob, :rev_parse, "#{ref}:#{path}")
+      repository = resolve_repository(repo)
+      tpl_data(repository, ref, path, {
+          :blob => repository.rev_parse("#{ref}:#{path}")
+        })
     end
 
     def tree(repo, ref, path)
-      repo_action(repo, ref, path, :tree, :tree, ref, path).merge({:readme => readme(repo, ref, path)})
+      repository = resolve_repository(repo)
+      tpl_data(repository, ref, path, {
+          :tree => repository.tree(ref, path)
+        }).merge(:readme => readme(repo, ref, path))
     end
 
     def tree_entry(repo, ref, path)
@@ -45,11 +51,17 @@ module Dolt
     end
 
     def blame(repo, ref, path)
-      repo_action(repo, ref, path, :blame, :blame, ref, path)
+      repository = resolve_repository(repo)
+      tpl_data(repository, ref, path, {
+          :blame => repository.blame(ref, path)
+        })
     end
 
     def history(repo, ref, path, count)
-      repo_action(repo, ref, path, :commits, :log, ref, path, count)
+      repository = resolve_repository(repo)
+      tpl_data(repository, ref, path, {
+          :commits => repository.log(ref, path, count)
+        })
     end
 
     def refs(repo)
@@ -62,7 +74,10 @@ module Dolt
     end
 
     def tree_history(repo, ref, path, count)
-      repo_action(repo, ref, path, :tree, :tree_history, ref, path, count)
+      repository = resolve_repository(repo)
+      tpl_data(repository, ref, path, {
+          :tree => repository.tree_history(ref, path, count)
+        })
     end
 
     def archive(repo, ref, format)
@@ -84,14 +99,6 @@ module Dolt
 
     private
     def repo_resolver; @repo_resolver; end
-
-    def repo_action(repo, ref, path, data, method, *args)
-      repository = resolve_repository(repo)
-
-      tpl_data(repository, ref, path, {
-          data => repository.send(method, *args)
-        })
-    end
 
     def tpl_data(repo, ref, path, locals = {})
       { :path => path,

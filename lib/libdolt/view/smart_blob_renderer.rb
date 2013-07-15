@@ -25,7 +25,14 @@ module Dolt
       include Dolt::View::SyntaxHighlight
 
       def format_text_blob(path, content, repo = nil, ref = nil, options = {})
-        return render_markup(path, content) if supported_markup_format?(path)
+        begin
+          return render_markup(path, content) if supported_markup_format?(path)
+        rescue StandardError => err
+          $stderr.puts("Failed rendering markup in #{path}, render syntax highlighted insted")
+          $stderr.puts("Original error was: #{err.name}")
+          $stderr.puts(err.backtrace)
+        end
+
         highlight_multiline(path, content, options)
       end
     end

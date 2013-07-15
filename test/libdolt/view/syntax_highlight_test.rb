@@ -48,14 +48,6 @@ describe Dolt::View::Blob do
       assert_match "Hey<span class=\"nt\">&lt;/h1&gt;</span>", html
     end
 
-    it "highlights file with custom suffix" do
-      Makeup::SyntaxHighlighter.add_lexer_alias("derp", "rb")
-      html = highlight("file.derp", "class File")
-
-      assert_match "<span class=\"k\">class</span>", html
-      assert_match "<span class=\"nc\">File</span>", html
-    end
-
     it "skips highlighting if lexer is missing" do
       html = highlight("file.trololol", "Yeah yeah yeah")
 

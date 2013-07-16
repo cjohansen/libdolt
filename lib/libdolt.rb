@@ -17,7 +17,6 @@
 #++
 require "libdolt/version"
 require "libdolt/disk_repo_resolver"
-require "libdolt/gitorious_repo_resolver"
 require "libdolt/repository_lookup"
 require "libdolt/view"
 

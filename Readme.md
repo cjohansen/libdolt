@@ -20,21 +20,25 @@ libdolt depends on two system packages to do its job.
 
 ### Systems using apt (Debian/Ubuntu, others)
 
-    # 1) Install Python development files
-    sudo apt-get install -y python-dev libicu-dev
+```sh
+# 1) Install Python development files
+sudo apt-get install -y python-dev libicu-dev
 
-    # 2) Install dolt. This may or may not require the use of sudo, depending on
-    #    how you installed Ruby.
-    gem install libdolt
+# 2) Install dolt. This may or may not require the use of sudo, depending on
+#    how you installed Ruby.
+gem install libdolt
+```
 
 ### Systems using yum (Fedora/CentOS/RedHat, others)
 
-    # 1) Install Python development files
-    sudo yum install -y python-devel libicu-devel
+```sh
+# 1) Install Python development files
+sudo yum install -y python-devel libicu-devel
 
-    # 3) Install dolt. This may or may not require the use of sudo, depending on
-    #    how you installed Ruby.
-    gem install dolt
+# 2) Install dolt. This may or may not require the use of sudo, depending on
+#    how you installed Ruby.
+gem install dolt
+```
 
 ## API
 

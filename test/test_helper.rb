@@ -46,15 +46,15 @@ module Dolt
       root = File.join(File.dirname(__FILE__), "..", "views")
       renderer = Tiltout.new(root, options)
       renderer.helper(helpers || [Dolt::View::MultiRepository,
-                                  Dolt::View::Urls,
-                                  Dolt::View::Object,
-                                  Dolt::View::Blob,
-                                  Dolt::View::Tree,
-                                  Dolt::View::Blame,
-                                  Dolt::View::SyntaxHighlight,
-                                  Dolt::View::Commit,
-                                  Dolt::View::Gravatar,
-                                  Dolt::View::Breadcrumb])
+          Dolt::View::Urls,
+          Dolt::View::Object,
+          Dolt::View::Blob,
+          Dolt::View::Tree,
+          Dolt::View::Blame,
+          Dolt::View::SyntaxHighlight,
+          Dolt::View::Commit,
+          Dolt::View::Gravatar,
+          Dolt::View::Breadcrumb])
       renderer
     end
   end
@@ -77,6 +77,124 @@ module Dolt
     def stream(ios)
       return ios if !ios.nil? && !ios.is_a?(String)
       StringIO.new(ios || "")
+    end
+  end
+end
+
+module Stub
+  class Blob
+    def is_a?(type)
+      type == Rugged::Blob
+    end
+  end
+
+  class Tree
+    def is_a?(type)
+      type == Rugged::Tree
+    end
+  end
+end
+
+module Test
+  class Router
+    def tree_url(repo, ref, path)
+      "/#{repo}/tree/#{ref}:#{path}"
+    end
+
+    def blob_url(repo, ref, path)
+      "/#{repo}/blob/#{ref}:#{path}"
+    end
+
+    def tree_entry_url(repo, ref, path)
+      "/#{repo}/source/#{ref}:#{path}"
+    end
+
+    def blame_url(repo, ref, path)
+      "/#{repo}/blame/#{ref}:#{path}"
+    end
+
+    def history_url(repo, ref, path)
+      "/#{repo}/history/#{ref}:#{path}"
+    end
+
+    def tree_history_url(repo, ref, path)
+      "/#{repo}/tree_history/#{ref}:#{path}"
+    end
+
+    def raw_url(repo, ref, path)
+      "/#{repo}/raw/#{ref}:#{path}"
+    end
+
+    def method_missing(name, *args, &block)
+      @actions.send(name, *args, &block)
+    end
+  end
+
+  class RedirectingRouter < Router
+    def redirect_refs?; true; end
+  end
+
+  class Renderer
+    attr_reader :data
+    def initialize(body = ""); @body = body; end
+
+    def render(action, data, options = {})
+      @action = action
+      @data = data
+      "#{action}:#@body"
+    end
+  end
+
+  class Lookup
+    attr_reader :repo, :ref, :path
+
+    def initialize(response)
+      @response = response
+    end
+
+    def blob(repo, ref, path)
+      respond(:blob, repo, ref, path)
+    end
+
+    def tree(repo, ref, path)
+      respond(:tree, repo, ref, path)
+    end
+
+    def tree_entry(repo, ref, path)
+      respond(:tree_entry, repo, ref, path)
+    end
+
+    def raw(repo, ref, path)
+      respond(:raw, repo, ref, path)
+    end
+
+    def blame(repo, ref, path)
+      respond(:blame, repo, ref, path)
+    end
+
+    def history(repo, ref, path, limit)
+      respond(:history, repo, ref, path)
+    end
+
+    def refs(repo)
+      respond(:refs, repo)
+    end
+
+    def tree_history(repo, ref, path, count)
+      respond(:tree_history, repo, ref, path)
+    end
+
+    def respond(type, repo, ref = nil, path = nil)
+      @repo = repo
+      @ref = ref
+      @path = path
+      data = { :ref => ref, :repository => repo }
+      data[type != :tree_entry ? type : (@response.class.to_s =~ /Tree/ ? :tree : :blob)] = @response
+      data
+    end
+
+    def rev_parse_oid(repo, ref)
+      "a" * 40
     end
   end
 end

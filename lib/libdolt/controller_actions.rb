@@ -33,17 +33,28 @@ module Dolt
     end
 
     def render_error(error, repo, ref, data = {})
-      $stderr.puts(error.message)
+      $stderr.puts("#{error.class.to_s}: #{error.message}")
       $stderr.puts(error.backtrace)
 
       if error.class.to_s == "Rugged::ReferenceError" && ref == "HEAD"
-        return [200, headers, [renderer.render("empty", {
+        template = "empty"
+        return [200, headers, [renderer.render(template, {
                 :repository => repo,
                 :ref => ref
               }.merge(data))]]
       end
 
-      [response, headers, [renderer.render(response.to_s.to_sym, {
+      if error.class.to_s == "Rugged::ReferenceError"
+        template = "non_existent"
+        return [404, headers, [renderer.render(template, {
+                :repository => repo,
+                :ref => ref
+              }.merge(data))]]
+      end
+
+      response = error.class.to_s == "Rugged::IndexerError" ? 404 : 500
+      template = response.to_s.to_sym
+      [response, headers, [renderer.render(template, {
               :error => error,
               :repository_slug => repo,
               :ref => ref

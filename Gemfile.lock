@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    libdolt (0.27.0)
+    libdolt (0.28.0)
       htmlentities (~> 4.3)
       json (~> 1.7)
       makeup (~> 0.4)
@@ -17,7 +17,7 @@ GEM
     ci_reporter (1.9.0)
       builder (>= 2.1.2)
     escape_utils (0.3.2)
-    github-linguist (2.8.5)
+    github-linguist (2.8.6)
       charlock_holmes (~> 0.6.6)
       escape_utils (~> 0.3.1)
       mime-types (~> 1.19)

@@ -48,7 +48,8 @@ module Dolt
         template = "non_existent"
         return [404, headers, [renderer.render(template, {
                 :repository => repo,
-                :ref => ref
+                :ref => ref,
+                :error => error
               }.merge(data))]]
       end
 

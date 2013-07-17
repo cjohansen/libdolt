@@ -107,6 +107,12 @@ describe Dolt::View::Blame do
 
       assert_match /2012-01-01/, html
     end
+
+    it "includes the commit summary" do
+      html = blame_annotation_cell({ :committer => @committer, :oid => @oid, :summary => "Doing it" })
+
+      assert_match "Doing it", html
+    end
   end
 
   describe "#blame_code_cell" do

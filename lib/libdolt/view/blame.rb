@@ -42,7 +42,7 @@ module Dolt
 
         <<-HTML
           <td class="#{class_name}">
-            <span class="gts-commit-oid" data-gts-commit-oid="#{annotation[:oid]}">#{annotation[:oid][0..6]}</span>
+            <span class="gts-commit-oid" data-gts-commit-oid="#{annotation[:oid]}" title="#{annotation[:summary]}">#{annotation[:oid][0..6]}</span>
             #{annotation[:committer][:time].strftime("%Y-%m-%d")}
             #{annotation[:committer][:name]}
           </td>

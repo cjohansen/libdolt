@@ -91,7 +91,7 @@ describe Dolt::Git::Archiver do
       FileUtils.expects(:mv).with("/work/gts-mainline-master.tar.gz",
                                   "/cache/gts-mainline-master.tar.gz")
       repo = StubRepository.new("gts/mainline")
-      Dolt::Git.stubs(:open).returns(Dolt::FakeProcess.new(0))
+      Dolt::Git.stubs(:shell).returns(Dolt::FakeProcess.new(0))
 
       @archiver.archive(repo, "master", :tar)
     end
@@ -109,7 +109,7 @@ describe Dolt::Git::Archiver do
 
     it "returns generated filename" do
       FileUtils.stubs(:mv)
-      Dolt::Git.stubs(:open).returns(Dolt::FakeProcess.new(0))
+      Dolt::Git.stubs(:shell).returns(Dolt::FakeProcess.new(0))
       repo = StubRepository.new("gts/mainline")
 
       filename = @archiver.archive(repo, "master", :tar)

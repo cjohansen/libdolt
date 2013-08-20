@@ -228,7 +228,34 @@ describe Dolt::Git::Repository do
       end
 
       assert_equal 0, @repository.readmes("master").length
-      assert_equal 1, @repository.readmes("master","lib").length
+      assert_equal 1, @repository.readmes("master", "lib").length
+    end
+  end
+
+  describe "actual_blob" do
+    it "returns regular blob" do
+      blob = @repository.actual_blob("master", "lib/foo.rb").content
+      assert_equal "module Foo\nend\n", blob
+    end
+
+    it "resolves symlink" do
+      blob = @repository.actual_blob("master", "lib/symlink.rb").content
+      assert_equal "module Foo\nend\n", blob
+    end
+
+    it "resolves double symlink" do
+      blob = @repository.actual_blob("master", "lib/double-symlink.rb").content
+      assert_equal "module Foo\nend\n", blob
+    end
+
+    it "returns nil for out of bounds symlink" do
+      blob = @repository.actual_blob("master", "lib/oob-symlink.rb")
+      assert_equal nil, blob
+    end
+
+    it "returns nil for invalid symlink" do
+      blob = @repository.actual_blob("master", "lib/invalid-symlink.rb")
+      assert_equal nil, blob
     end
   end
 end

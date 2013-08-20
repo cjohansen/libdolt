@@ -117,11 +117,11 @@ module Dolt
     def readme(repo_name, ref, path)
       repository = resolve_repository(repo_name)
       readmes = repository.readmes(ref, path)
-      readme = readmes.detect {|blob| Makeup::Markup.can_render?(blob[:name])}
+      readme = readmes.detect { |blob| Makeup::Markup.can_render?(blob[:name]) }
       return unless readme
       blob_path = File.join(*[path, readme[:name]].reject { |p| p == "" })
-      blob = repository.blob(ref, blob_path)
-      {:blob => blob, :path => blob_path}
+      { :blob => repository.actual_blob(ref, blob_path),
+        :path => blob_path }
     end
 
     def filemode(repo, ref, path)

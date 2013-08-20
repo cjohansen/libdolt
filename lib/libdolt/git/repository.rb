@@ -86,6 +86,30 @@ module Dolt
         []
       end
 
+      # Returns the blob, or if the blob is a symlink, returns the
+      # blob it's pointing to. If the link is defunct, returns nil.
+      def actual_blob(ref, path)
+        path = Pathname.new(path)
+        tree_path = path.dirname
+        blob_path = path.basename
+
+        blob_entry = rev_parse("#{ref}:#{tree_path}/").entries.find do |e|
+          e[:name] == blob_path.to_s
+        end
+
+        return if blob_entry.nil?
+        blob = blob(ref, path.to_s)
+
+        # Filemode 120000 is a symlink
+        if blob_entry[:filemode] == "120000".to_i(8)
+          return actual_blob(ref, tree_path + blob.content)
+        end
+
+        blob
+      rescue Rugged::TreeError => err
+        nil
+      end
+
       private
       def entry_history(ref, entry, limit)
         process = Dolt::Git.git(path, "log -n #{limit} #{ref} -- #{entry}")

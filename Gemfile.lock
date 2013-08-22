@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    libdolt (0.30.0)
+    libdolt (0.31.0)
       htmlentities (~> 4.3)
       json (~> 1.7)
       makeup (~> 0.4)
@@ -17,7 +17,7 @@ GEM
     ci_reporter (1.9.0)
       builder (>= 2.1.2)
     escape_utils (0.3.2)
-    github-linguist (2.8.8)
+    github-linguist (2.9.4)
       charlock_holmes (~> 0.6.6)
       escape_utils (~> 0.3.1)
       mime-types (~> 1.19)
@@ -31,7 +31,7 @@ GEM
       htmlentities (~> 4.3)
       pygments.rb (~> 0.4)
     metaclass (0.0.1)
-    mime-types (1.23)
+    mime-types (1.24)
     minitest (2.12.1)
     mocha (0.14.0)
       metaclass (~> 0.0.1)

@@ -15,6 +15,7 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
+require "pathname"
 require "rugged"
 require "libdolt/git"
 require "libdolt/git/blame"
@@ -90,10 +91,9 @@ module Dolt
       # blob it's pointing to. If the link is defunct, returns nil.
       def actual_blob(ref, path)
         path = Pathname.new(path)
-        tree_path = path.dirname
+        tree_path = path.dirname.sub(/^\.$/, "")
         blob_path = path.basename
-
-        blob_entry = rev_parse("#{ref}:#{tree_path}/").entries.find do |e|
+        blob_entry = rev_parse("#{ref}:#{tree_path}").entries.find do |e|
           e[:name] == blob_path.to_s
         end
 

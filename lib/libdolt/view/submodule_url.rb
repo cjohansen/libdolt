@@ -38,7 +38,7 @@ module Dolt
         def browse_url(url, commit)
           mountpoints.each do |mountpoint|
             path = parse_mountpoint(mountpoint, url)
-            return generate_url(*path, commit) if path
+            return generate_url(path[0], path[1], commit) if path
           end
           return nil
         end

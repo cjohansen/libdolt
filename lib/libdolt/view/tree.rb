@@ -20,11 +20,11 @@ module Dolt
   module View
     module Tree
       def object_path(root, object)
+        return object if object[:type] == :submodule
         File.join(root, object[:name]).sub(/^\//, "")
       end
 
       def object_url(repository, ref, path, object)
-        return object[:url] if object[:type] == :submodule
         send(:"#{object[:type]}_url", repository, ref, object_path(path, object))
       end
 

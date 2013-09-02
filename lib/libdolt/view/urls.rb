@@ -19,6 +19,10 @@
 module Dolt
   module View
     module Urls
+      def submodule_url(repository, ref, object)
+        SubmoduleUrl.for(object)
+      end
+
       def tree_url(repository, ref, path = "")
         repo_url(repository, "/tree/#{ref}:#{path}")
       end

@@ -238,9 +238,40 @@ describe Dolt::View::Tree do
     end
   end
 
-  it "links submodule object to submodule" do
-    url = "git://gitorious.org/gitorious/ui3.git"
-    object = { :type => :submodule, :url => url }
-    assert_equal url, object_url("gitorious", "master", "vendor", object)
+  describe "submodule url" do
+    def generated_url(url)
+      object = { :type => :submodule, :url => url, :oid => "sha123" }
+      object_url("gitorious", "master", "vendor", object)
+    end
+
+    it "links submodules with unknown hosting to original url" do
+      url = "git://example.com/gitorious/ui3.git"
+      assert_equal url, generated_url(url)
+    end
+
+    it "links submodules hosted on github.com to the correct commit on github.com" do
+      correct_url = "https://github.com/gitorious/ui3/tree/sha123"
+
+      assert_equal correct_url, generated_url("git@github.com:gitorious/ui3.git")
+      assert_equal correct_url, generated_url("git://github.com/gitorious/ui3.git")
+      assert_equal correct_url, generated_url("https://github.com/gitorious/ui3.git")
+    end
+
+    it "links submodules hosted on gitorious.org to the correct commit on gitorious.org" do
+      correct_url = "https://gitorious.org/gitorious/ui3/source/sha123"
+
+      assert_equal correct_url, generated_url("git@gitorious.org:gitorious/ui3.git")
+      assert_equal correct_url, generated_url("git://gitorious.org/gitorious/ui3.git")
+      assert_equal correct_url, generated_url("http://git.gitorious.org/gitorious/ui3.git")
+      assert_equal correct_url, generated_url("http://git.gitorious.org/~foo/gitorious/ui3.git")
+      assert_equal correct_url, generated_url("http://git.gitorious.org/+bar/gitorious/ui3.git")
+    end
+
+    it "links submodules hosted on bitbucket.org to the correct commit on bitbucket.org" do
+      correct_url = "https://bitbucket.org/gitorious/ui3/src/sha123"
+
+      assert_equal correct_url, generated_url("git@bitbucket.org:gitorious/ui3.git")
+      assert_equal correct_url, generated_url("https://bitbucket.org/gitorious/ui3.git")
+    end
   end
 end

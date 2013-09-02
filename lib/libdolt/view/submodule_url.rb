@@ -119,7 +119,10 @@ module Dolt
         include Parser
 
         def mountpoints
-          [GitMountPoint.new("gitorious.org"), HttpMountPoint.new("git.gitorious.org"), GitSshMountPoint.new("git", "gitorious.org")]
+          [GitMountPoint.new("gitorious.org"),
+           HttpMountPoint.new("git.gitorious.org", "http"),
+           HttpMountPoint.new("git.gitorious.org", "https"),
+           GitSshMountPoint.new("git", "gitorious.org")]
         end
 
         def generate_url(project, repository, commit)

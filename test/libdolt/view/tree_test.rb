@@ -263,6 +263,7 @@ describe Dolt::View::Tree do
       assert_equal correct_url, generated_url("git@gitorious.org:gitorious/ui3.git")
       assert_equal correct_url, generated_url("git://gitorious.org/gitorious/ui3.git")
       assert_equal correct_url, generated_url("http://git.gitorious.org/gitorious/ui3.git")
+      assert_equal correct_url, generated_url("https://git.gitorious.org/gitorious/ui3.git")
       assert_equal correct_url, generated_url("http://git.gitorious.org/~foo/gitorious/ui3.git")
       assert_equal correct_url, generated_url("http://git.gitorious.org/+bar/gitorious/ui3.git")
     end

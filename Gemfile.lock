@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    libdolt (0.33.0)
+    libdolt (0.33.1)
       htmlentities (~> 4.3)
       json (~> 1.7)
-      makeup (~> 0.4)
+      makeup (~> 0.4.1)
       mime-types (~> 1.19)
       rugged (= 0.18.0.gh.de28323)
       tzinfo (~> 0.3)
@@ -25,13 +25,13 @@ GEM
     github-markup (0.7.5)
     htmlentities (4.3.1)
     json (1.8.0)
-    makeup (0.4.0)
+    makeup (0.4.1)
       github-linguist (~> 2.8)
       github-markup (~> 0.7)
       htmlentities (~> 4.3)
       pygments.rb (~> 0.4)
     metaclass (0.0.1)
-    mime-types (1.24)
+    mime-types (1.25)
     minitest (2.12.1)
     mocha (0.14.0)
       metaclass (~> 0.0.1)

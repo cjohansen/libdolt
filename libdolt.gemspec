@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rugged", "0.18.0.gh.de28323"
   s.add_dependency "tzinfo", "~> 0.3"
-  s.add_dependency "makeup", "~>0.4"
+  s.add_dependency "makeup", "~> 0.4.1"
   s.add_dependency "htmlentities", "~> 4.3"
   s.add_dependency "json", "~> 1.7"
   s.add_dependency "mime-types", "~> 1.19"

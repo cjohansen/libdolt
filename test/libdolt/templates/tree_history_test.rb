@@ -40,6 +40,19 @@ describe "tree_history template" do
       }]
     }, {
       :type => :blob,
+      :oid => "da78b0d251e3a130eee02c156494f062f23411fb",
+      :filemode => 33188,
+      :name => "żółć".force_encoding('ascii-8bit'),
+      :history => [{
+        :oid => "dea60ba48842ae4b45341545b24948cf421d173e",
+        :author => { :name => "Zenon Żółć".force_encoding('ascii-8bit'),
+                     :email => "zenon@zolc.pl" },
+        :summary => "A commit with some national characters",
+        :date => Time.parse("Sat Sep 1 21:40:19 +0200 2012"),
+        :message => ""
+      }]
+    }, {
+      :type => :blob,
       :oid => "c80ee3697054566d1a4247d80be78ec3ddfde295",
       :filemode => 33188,
       :name => "Gemfile",
@@ -64,6 +77,19 @@ describe "tree_history template" do
                      "email" => "christian@cjohansen.no" },
         "summary" => "Working Moron server for viewing blobs",
         "date" => "2012-09-10T15:07:39+02:00",
+        "message" => ""
+      }]
+    }, {
+      "type" => "blob",
+      "oid" => "da78b0d251e3a130eee02c156494f062f23411fb",
+      "filemode" => 33188,
+      "name" => "żółć",
+      "history" => [{
+        "oid" => "dea60ba48842ae4b45341545b24948cf421d173e",
+        "author" => { "name" => "Zenon Żółć",
+                     "email" => "zenon@zolc.pl" },
+        "summary" => "A commit with some national characters",
+        "date" => "2012-09-01T21:40:19+02:00",
         "message" => ""
       }]
     }, {

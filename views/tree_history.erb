@@ -21,5 +21,6 @@ tree.each do |entry|
   entry[:history].each do |e|
     e[:author][:name].force_encoding("utf-8")
   end
+  entry[:name].force_encoding("utf-8")
 end if "".respond_to?(:force_encoding)
 %><%= JSON.generate(tree) %>

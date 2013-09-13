@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    libdolt (0.33.1)
+    libdolt (0.33.2)
       htmlentities (~> 4.3)
       json (~> 1.7)
       makeup (~> 0.4.1)

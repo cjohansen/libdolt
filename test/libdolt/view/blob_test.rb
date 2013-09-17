@@ -73,4 +73,13 @@ describe Dolt::View::Blob do
       assert_match /&lt;hey&gt;/, html
     end
   end
+
+  describe "safe_blob_text" do
+    it "returns blob's text with all invalid characters (for string's encoding) replaced with �" do
+      repository = Dolt::Git::Repository.new(Dolt.fixture_repo_path)
+      blob = repository.blob('master', 'bad-utf.txt')
+
+      assert_equal "żółć & �.", safe_blob_text(blob)
+    end
+  end
 end

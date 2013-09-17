@@ -72,6 +72,17 @@ The content you're attempting to browse appears to be binary.
         "<pre class=\"#{class_names.join(' ')}\">" +
           "<ol class=\"linenums gts-lines\">#{lines}</ol></pre>"
       end
+
+      def safe_blob_text(blob)
+        text = blob.text(nil, defined?(Encoding) ? Encoding.default_external : nil)
+
+        if text.respond_to?(:encode)
+          text = text.encode('UTF-16', :invalid => :replace, :undef => :replace,
+                                       :replace => "�").encode('UTF-8')
+        end
+
+        text
+      end
     end
   end
 end

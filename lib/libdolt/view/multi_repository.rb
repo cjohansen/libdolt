@@ -20,7 +20,7 @@ module Dolt
   module View
     module MultiRepository
       def repo_url(repository, url)
-        "/#{repository}#{url}"
+        URI.encode("/#{repository}#{url}".force_encoding('ascii-8bit'))
       end
 
       def refs_url(repository)

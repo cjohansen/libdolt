@@ -200,13 +200,6 @@ describe Dolt::View::Tree do
     end
   end
 
-  describe "#object_path" do
-    it "returns URL-encoded object path" do
-      object = { :type => "blob", :name => "Gem\xC3\xF5file".force_encoding('ascii-8bit') }
-      assert_equal "the-dir/Gem%C3%F5file", object_path("the-dir", object)
-    end
-  end
-
   describe "single repo mode" do
     include Dolt::View::SingleRepository
 

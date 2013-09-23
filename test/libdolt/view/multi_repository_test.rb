@@ -24,7 +24,7 @@ describe Dolt::View::MultiRepository do
 
   describe "#repo_url" do
     it "returns url prefixed with repository" do
-      assert_equal "/gitorious/some/url", repo_url("gitorious", "/some/url")
+      assert_equal "/gitorious/some/%C3%F5/url", repo_url("gitorious", "/some/\xC3\xF5/url")
     end
 
     it "returns url prefixed with repository name containing slashes" do

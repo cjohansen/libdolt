@@ -24,7 +24,7 @@ describe Dolt::View::SingleRepository do
 
   describe "#repo_url" do
     it "returns url unmodified" do
-      assert_equal "/some/url", repo_url("gitorious", "/some/url")
+      assert_equal "/some/url%C3%F5", repo_url("gitorious", "/some/url\xC3\xF5")
     end
   end
 end

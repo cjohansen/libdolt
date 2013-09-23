@@ -20,7 +20,7 @@ module Dolt
   module View
     module SingleRepository
       def repo_url(repository, url)
-        url
+        URI.encode(url.force_encoding('ascii-8bit'))
       end
 
       def refs_url(repository)

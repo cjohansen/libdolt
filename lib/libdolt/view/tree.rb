@@ -21,9 +21,7 @@ module Dolt
     module Tree
       def object_path(root, object)
         return object if object[:type] == :submodule
-        path = File.join(root, object[:name]).sub(/^\//, "")
-
-        URI.encode(path)
+        File.join(root, object[:name]).sub(/^\//, "")
       end
 
       def object_url(repository, ref, path, object)

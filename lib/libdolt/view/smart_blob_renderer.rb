@@ -29,7 +29,7 @@ module Dolt
           return render_markup(path, content) if supported_markup_format?(path)
         rescue StandardError => err
           $stderr.puts("Failed rendering markup in #{path}, render syntax highlighted insted")
-          $stderr.puts("Original error was: #{err.name}")
+          $stderr.puts("Original error was: #{err}")
           $stderr.puts(err.backtrace)
         end
 

@@ -108,7 +108,7 @@ describe Dolt::Git::Repository do
       begin
         tree = @repository.tree_history("master", "README.org")
         raise "Should've raised an Exception"
-      rescue Exception => err
+      rescue Rugged::TreeError => err
         assert_match /not a tree/, err.message
       end
     end

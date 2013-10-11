@@ -50,9 +50,8 @@ module Dolt
       end
 
       def tree(ref, path)
-        object = rev_parse("#{ref}:#{path}")
-        raise StandardError.new("Not a tree") if !object.is_a?(Rugged::Tree)
-        annotate_tree(ref, path, object)
+        tree = tree_for_ref_and_path(ref, path)
+        annotate_tree(ref, path, tree)
       end
 
       def tree_entry(ref, path)
@@ -69,14 +68,18 @@ module Dolt
       end
 
       def tree_history(ref, path, limit = 1)
+        tree = tree_for_ref_and_path(ref, path)
+        annotate_history(path || "./", ref, tree, limit)
+      end
+
+      def tree_for_ref_and_path(ref, path)
         tree = rev_parse("#{ref}:#{path}")
 
-        if tree.class != Rugged::Tree
-          message = "#{ref}:#{path} is not a tree (#{tree.class.to_s})"
-          raise Exception.new(message)
+        unless tree.is_a?(Rugged::Tree)
+          raise Rugged::TreeError, "#{ref}:#{path} is not a tree (#{tree.class.to_s})"
         end
 
-        annotate_history(path || "./", ref, tree, limit)
+        tree
       end
 
       def readmes(ref, path="")

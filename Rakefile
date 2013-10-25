@@ -1,6 +1,15 @@
 require "rake/testtask"
 require "ci/reporter/rake/minitest"
-require "bundler/gem_tasks"
+begin
+  require "bundler/gem_tasks"
+rescue LoadError => e
+  # The bundler package in RHEL 6's ruby193 SCL will break when attempting to
+  # load vendored thor. Tested on ruby193-rubygem-bundler-1.1.4-3.el6.noarch.
+  if e.message != 'cannot load such file -- thor'
+    raise
+  end
+end
+
 
 Rake::TestTask.new("test") do |test|
   test.libs << "test"

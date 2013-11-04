@@ -20,6 +20,7 @@ require "libdolt/disk_repo_resolver"
 require "libdolt/repository_lookup"
 require "libdolt/controller_actions"
 require "libdolt/view"
+require "force_utf8/encode"
 
 module Dolt
   def self.template_dir

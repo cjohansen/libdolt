@@ -109,6 +109,7 @@ module Dolt
     end
 
     def expand_refs(repository, names, type)
+      names = names.map { |n| ForceUtf8::Encode.encode(n) }
       names.select { |n| n =~ /#{type}/ }.map do |n|
         [n.sub(/^refs\/#{type}\//, ""), repository.rev_parse_oid(n)]
       end

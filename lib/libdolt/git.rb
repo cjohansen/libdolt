@@ -23,7 +23,7 @@ module Dolt
   module Git
     def self.shell(command)
       stdin, stdout, stderr, wait_thread = Open3.popen3(command)
-      Dolt::Git::Process.new(stdin, stdout, stderr, wait_thread && wait_thread.value || $?)
+      Dolt::Git::Process.new(stdin, stdout, stderr, wait_thread)
     end
 
     def self.git(git_dir, command)

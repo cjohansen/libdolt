@@ -21,23 +21,29 @@ module Dolt
     class Process
       attr_reader :stdin, :stdout, :stderr
 
-      def initialize(stdin, stdout, stderr, process_status)
+      def initialize(stdin, stdout, stderr, wait_thread)
         @stdin = stdin
         @stdout = stdout
         @stderr = stderr
-        @process_status = process_status
+        @wait_thread = wait_thread
       end
 
       def success?
-        @process_status.success?
+        process_status.success?
       end
 
       def exit_code
-        @process_status.exitstatus
+        process_status.exitstatus
       end
 
       def exception
         Exception.new(stderr.read)
+      end
+
+      private
+
+      def process_status
+        @wait_thread.value
       end
     end
   end

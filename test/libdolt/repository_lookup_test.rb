@@ -55,6 +55,14 @@ describe Dolt::RepositoryLookup do
       assert Rugged::Blob === data[:blob]
       assert_equal "100644", data[:filemode]
     end
+
+    it "looks up blob by sha1" do
+      data = @lookup.blob("gitorious", "c035ba24bb3bed31589bc6736ca9b116175eb723", "README.org")
+      assert_equal "gitorious", data[:repository_slug]
+      assert_equal "c035ba24bb3bed31589bc6736ca9b116175eb723", data[:ref]
+      assert Rugged::Blob === data[:blob]
+      assert_equal "100644", data[:filemode]
+    end
   end
 
   describe "#tree" do

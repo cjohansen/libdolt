@@ -29,8 +29,14 @@ module Dolt
 
     def blob(repo, ref, path)
       repository = resolve_repository(repo)
+      blob = repository.rev_parse(ref)
+
+      if !blob.is_a?(Rugged::Blob)
+        blob = repository.rev_parse("#{ref}:#{path}")
+      end
+
       tpl_data(repository, ref, path, {
-          :blob => repository.rev_parse("#{ref}:#{path}"),
+          :blob => blob,
           :filemode => filemode(repository, ref, path)
         })
     end
@@ -131,6 +137,8 @@ module Dolt
       refspec = "#{ref}:#{File.dirname(path).sub(/^\.$/, '')}"
       entry = repo.rev_parse(refspec).find { |e| e[:name] == file }
       entry.nil? ? nil : entry[:filemode].to_s(8)
+    rescue Rugged::InvalidError
+      "100644" # Pretty much a guess :/
     end
   end
 
